@@ -43,6 +43,20 @@ const routes: RouteRecordRaw[] = [
     },
   },
 
+  // Design System Showcase - Development route
+  {
+    path: '/design-system',
+    name: 'DesignSystem',
+    component: () => import('../components/design-system/showcase/DesignSystemShowcase.vue'),
+    meta: {
+      title: 'Design System - GoEdu Components',
+      description: 'Interactive showcase of banking UI components',
+      public: true,
+      showInNavigation: true,
+      icon: 'mdi-palette',
+    },
+  },
+
   // Placeholder routes for future development
   {
     path: '/login',
