@@ -36,12 +36,7 @@
         size="small"
         class="banking-table-cell__status"
       >
-        <VIcon
-          v-if="getStatusIcon(value)"
-          :icon="getStatusIcon(value)"
-          size="small"
-          start
-        />
+        <VIcon v-if="getStatusIcon(value)" :icon="getStatusIcon(value)" size="small" start />
         {{ getStatusText(value) }}
       </VChip>
     </template>
@@ -62,12 +57,7 @@
     <template v-else-if="type === 'actions'">
       <div class="banking-table-cell__actions">
         <slot name="actions" :item="item" :value="value">
-          <VBtn
-            icon="mdi-dots-vertical"
-            variant="text"
-            size="small"
-            @click="handleActionClick"
-          />
+          <VBtn icon="mdi-dots-vertical" variant="text" size="small" @click="handleActionClick" />
         </slot>
       </div>
     </template>
@@ -101,13 +91,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue'
-import { VChip, VIcon, VBtn } from 'vuetify/components'
-import type { BankingTableCellProps } from './BankingTable.types'
+import { computed, type PropType } from 'vue';
+import { VChip, VIcon, VBtn } from 'vuetify/components';
+import type { BankingTableCellProps } from './BankingTable.types';
 
 /**
  * Banking Table Cell Component
- * 
+ *
  * Specialized cell component for rendering different data types in banking tables
  * with proper formatting, accessibility, and visual indicators.
  */
@@ -115,66 +105,66 @@ import type { BankingTableCellProps } from './BankingTable.types'
 // Props
 const props = withDefaults(defineProps<BankingTableCellProps>(), {
   type: 'text',
-  editable: false
-})
+  editable: false,
+});
 
 // Events
 const emit = defineEmits<{
-  (event: 'action-click', item: any): void
-}>()
+  (event: 'action-click', item: any): void;
+}>();
 
 /**
  * Computed properties
  */
 const computedClasses = computed(() => {
-  const classes: string[] = ['banking-table-cell']
-  
+  const classes: string[] = ['banking-table-cell'];
+
   if (props.type) {
-    classes.push(`banking-table-cell--${props.type}`)
+    classes.push(`banking-table-cell--${props.type}`);
   }
-  
+
   if (props.editable) {
-    classes.push('banking-table-cell--editable')
+    classes.push('banking-table-cell--editable');
   }
-  
+
   if (props.class) {
     if (typeof props.class === 'string') {
-      classes.push(props.class)
+      classes.push(props.class);
     } else if (Array.isArray(props.class)) {
-      classes.push(...props.class)
+      classes.push(...props.class);
     }
   }
-  
-  return classes
-})
+
+  return classes;
+});
 
 const displayValue = computed(() => {
   if (props.value === null || props.value === undefined) {
-    return '—'
+    return '—';
   }
-  return String(props.value)
-})
+  return String(props.value);
+});
 
 /**
  * Currency formatting
  */
 function formatCurrency(value: any): string {
-  if (value === null || value === undefined || value === '') return '—'
-  
-  const numValue = Number(value)
-  if (isNaN(numValue)) return String(value)
-  
-  const options = props.format?.currency || { code: 'USD' }
-  
+  if (value === null || value === undefined || value === '') return '—';
+
+  const numValue = Number(value);
+  if (isNaN(numValue)) return String(value);
+
+  const options = props.format?.currency || { code: 'USD' };
+
   try {
     return new Intl.NumberFormat(options.locale || 'en-US', {
       style: 'currency',
       currency: options.code,
       minimumFractionDigits: options.minimumFractionDigits ?? 2,
-      maximumFractionDigits: options.maximumFractionDigits ?? 2
-    }).format(numValue)
+      maximumFractionDigits: options.maximumFractionDigits ?? 2,
+    }).format(numValue);
   } catch {
-    return `$${numValue.toFixed(2)}`
+    return `$${numValue.toFixed(2)}`;
   }
 }
 
@@ -182,37 +172,37 @@ function formatCurrency(value: any): string {
  * Percentage formatting
  */
 function formatPercentage(value: any): string {
-  if (value === null || value === undefined || value === '') return '—'
-  
-  const numValue = Number(value)
-  if (isNaN(numValue)) return String(value)
-  
-  const options = props.format?.percentage || {}
-  const decimals = options.minimumFractionDigits ?? 2
-  const showSymbol = options.showSymbol ?? true
-  
-  return `${numValue.toFixed(decimals)}${showSymbol ? '%' : ''}`
+  if (value === null || value === undefined || value === '') return '—';
+
+  const numValue = Number(value);
+  if (isNaN(numValue)) return String(value);
+
+  const options = props.format?.percentage || {};
+  const decimals = options.minimumFractionDigits ?? 2;
+  const showSymbol = options.showSymbol ?? true;
+
+  return `${numValue.toFixed(decimals)}${showSymbol ? '%' : ''}`;
 }
 
 /**
  * Number formatting
  */
 function formatNumber(value: any): string {
-  if (value === null || value === undefined || value === '') return '—'
-  
-  const numValue = Number(value)
-  if (isNaN(numValue)) return String(value)
-  
-  const options = props.format?.number || {}
-  
+  if (value === null || value === undefined || value === '') return '—';
+
+  const numValue = Number(value);
+  if (isNaN(numValue)) return String(value);
+
+  const options = props.format?.number || {};
+
   try {
     return new Intl.NumberFormat(options.locale || 'en-US', {
       minimumFractionDigits: options.minimumFractionDigits ?? 0,
       maximumFractionDigits: options.maximumFractionDigits ?? 2,
-      useGrouping: options.useGrouping ?? true
-    }).format(numValue)
+      useGrouping: options.useGrouping ?? true,
+    }).format(numValue);
   } catch {
-    return numValue.toLocaleString()
+    return numValue.toLocaleString();
   }
 }
 
@@ -220,109 +210,105 @@ function formatNumber(value: any): string {
  * Date formatting
  */
 function formatDate(value: any): string {
-  if (!value) return '—'
-  
-  const date = new Date(value)
-  if (isNaN(date.getTime())) return String(value)
-  
-  const options = props.format?.date
-  
+  if (!value) return '—';
+
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+
+  const options = props.format?.date;
+
   if (options?.format) {
     // Custom format would require a date formatting library
     // For now, use built-in formatting
-    return date.toLocaleDateString(options.locale || 'en-US')
+    return date.toLocaleDateString(options.locale || 'en-US');
   }
-  
-  return props.type === 'datetime' 
-    ? date.toLocaleString() 
-    : date.toLocaleDateString()
+
+  return props.type === 'datetime' ? date.toLocaleString() : date.toLocaleDateString();
 }
 
 /**
  * Full date formatting for tooltips
  */
 function formatDateFull(value: any): string {
-  if (!value) return ''
-  
-  const date = new Date(value)
-  if (isNaN(date.getTime())) return String(value)
-  
+  if (!value) return '';
+
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+
   return date.toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 }
 
 /**
  * Status formatting
  */
 function getStatusColor(value: any): string {
-  const colorMap = props.format?.status?.colorMap || {}
-  return colorMap[String(value)] || getDefaultStatusColor(value)
+  const colorMap = props.format?.status?.colorMap || {};
+  return colorMap[String(value)] || getDefaultStatusColor(value);
 }
 
 function getDefaultStatusColor(value: any): string {
-  const val = String(value).toLowerCase()
-  
-  if (['approved', 'complete', 'success', 'active'].includes(val)) return 'success'
-  if (['pending', 'in-progress', 'warning'].includes(val)) return 'warning'
-  if (['rejected', 'failed', 'error', 'inactive'].includes(val)) return 'error'
-  if (['under-review', 'draft', 'info'].includes(val)) return 'info'
-  
-  return 'default'
+  const val = String(value).toLowerCase();
+
+  if (['approved', 'complete', 'success', 'active'].includes(val)) return 'success';
+  if (['pending', 'in-progress', 'warning'].includes(val)) return 'warning';
+  if (['rejected', 'failed', 'error', 'inactive'].includes(val)) return 'error';
+  if (['under-review', 'draft', 'info'].includes(val)) return 'info';
+
+  return 'default';
 }
 
-function getStatusVariant(value: any): 'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' {
-  const color = getStatusColor(value)
-  return color === 'default' ? 'outlined' : 'tonal'
+function getStatusVariant(
+  value: any
+): 'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' {
+  const color = getStatusColor(value);
+  return color === 'default' ? 'outlined' : 'tonal';
 }
 
 function getStatusIcon(value: any): string | undefined {
-  const iconMap = props.format?.status?.iconMap || {}
-  const customIcon = iconMap[String(value)]
-  
-  if (customIcon) return customIcon
-  
-  const val = String(value).toLowerCase()
-  
-  if (['approved', 'complete', 'success', 'active'].includes(val)) return 'mdi-check-circle'
-  if (['pending', 'in-progress'].includes(val)) return 'mdi-clock-outline'
-  if (['rejected', 'failed', 'error'].includes(val)) return 'mdi-alert-circle'
-  if (['under-review', 'draft'].includes(val)) return 'mdi-eye-outline'
-  if (['warning'].includes(val)) return 'mdi-alert-triangle'
-  
-  return undefined
+  const iconMap = props.format?.status?.iconMap || {};
+  const customIcon = iconMap[String(value)];
+
+  if (customIcon) return customIcon;
+
+  const val = String(value).toLowerCase();
+
+  if (['approved', 'complete', 'success', 'active'].includes(val)) return 'mdi-check-circle';
+  if (['pending', 'in-progress'].includes(val)) return 'mdi-clock-outline';
+  if (['rejected', 'failed', 'error'].includes(val)) return 'mdi-alert-circle';
+  if (['under-review', 'draft'].includes(val)) return 'mdi-eye-outline';
+  if (['warning'].includes(val)) return 'mdi-alert-triangle';
+
+  return undefined;
 }
 
 function getStatusText(value: any): string {
-  const textMap = props.format?.status?.textMap || {}
-  return textMap[String(value)] || String(value)
+  const textMap = props.format?.status?.textMap || {};
+  return textMap[String(value)] || String(value);
 }
 
 /**
  * Boolean formatting
  */
 function getBooleanText(value: any): string {
-  const options = props.format?.boolean || {}
-  return value ? (options.trueText || 'Yes') : (options.falseText || 'No')
+  const options = props.format?.boolean || {};
+  return value ? options.trueText || 'Yes' : options.falseText || 'No';
 }
 
 function getBooleanIcon(value: boolean): string {
-  const options = props.format?.boolean || {}
-  return value 
-    ? (options.trueIcon || 'mdi-check-circle') 
-    : (options.falseIcon || 'mdi-close-circle')
+  const options = props.format?.boolean || {};
+  return value ? options.trueIcon || 'mdi-check-circle' : options.falseIcon || 'mdi-close-circle';
 }
 
 function getBooleanColor(value: boolean): string {
-  const options = props.format?.boolean || {}
-  return value 
-    ? (options.trueColor || 'success') 
-    : (options.falseColor || 'error')
+  const options = props.format?.boolean || {};
+  return value ? options.trueColor || 'success' : options.falseColor || 'error';
 }
 
 /**
@@ -331,36 +317,50 @@ function getBooleanColor(value: boolean): string {
 function getAuditIcon(action: string): string {
   switch (action?.toLowerCase()) {
     case 'create':
-    case 'created': return 'mdi-plus-circle'
+    case 'created':
+      return 'mdi-plus-circle';
     case 'update':
-    case 'updated': return 'mdi-pencil-circle'
+    case 'updated':
+      return 'mdi-pencil-circle';
     case 'delete':
-    case 'deleted': return 'mdi-delete-circle'
+    case 'deleted':
+      return 'mdi-delete-circle';
     case 'approve':
-    case 'approved': return 'mdi-check-circle'
+    case 'approved':
+      return 'mdi-check-circle';
     case 'reject':
-    case 'rejected': return 'mdi-cancel'
+    case 'rejected':
+      return 'mdi-cancel';
     case 'review':
-    case 'reviewed': return 'mdi-eye-circle'
-    default: return 'mdi-history'
+    case 'reviewed':
+      return 'mdi-eye-circle';
+    default:
+      return 'mdi-history';
   }
 }
 
 function getAuditColor(action: string): string {
   switch (action?.toLowerCase()) {
     case 'create':
-    case 'created': return 'success'
+    case 'created':
+      return 'success';
     case 'update':
-    case 'updated': return 'info'
+    case 'updated':
+      return 'info';
     case 'delete':
-    case 'deleted': return 'error'
+    case 'deleted':
+      return 'error';
     case 'approve':
-    case 'approved': return 'success'
+    case 'approved':
+      return 'success';
     case 'reject':
-    case 'rejected': return 'error'
+    case 'rejected':
+      return 'error';
     case 'review':
-    case 'reviewed': return 'warning'
-    default: return 'default'
+    case 'reviewed':
+      return 'warning';
+    default:
+      return 'default';
   }
 }
 
@@ -368,7 +368,7 @@ function getAuditColor(action: string): string {
  * Event handlers
  */
 function handleActionClick(): void {
-  emit('action-click', props.item)
+  emit('action-click', props.item);
 }
 </script>
 
@@ -486,7 +486,7 @@ function handleActionClick(): void {
   .banking-table-cell__audit-trail {
     align-items: center;
   }
-  
+
   .banking-table-cell__boolean {
     justify-content: flex-start;
   }
@@ -499,11 +499,11 @@ function handleActionClick(): void {
   .banking-table-cell__number {
     font-weight: 700;
   }
-  
+
   .banking-table-cell--editable {
     border: 1px solid transparent;
   }
-  
+
   .banking-table-cell--editable:hover {
     border-color: rgb(var(--v-theme-primary));
   }

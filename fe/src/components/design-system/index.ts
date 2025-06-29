@@ -1,25 +1,25 @@
 /**
  * GoEdu Design System - Component Library Index
- * 
+ *
  * Central export file for all design system components, types, and utilities.
  * This provides a clean import interface for consuming applications.
- * 
+ *
  * @example
  * import { BankingButton, BankingInput, ApprovalWorkflow } from '@/components/design-system'
  */
 
 // Base Components
-export { default as BankingButton } from './base/BankingButton.vue'
-export { default as BankingInput } from './base/BankingInput.vue'
-export { default as BankingTable } from './base/BankingTable.vue'
-export { default as BankingTableCell } from './base/BankingTableCell.vue'
+export { default as BankingButton } from './base/BankingButton.vue';
+export { default as BankingInput } from './base/BankingInput.vue';
+export { default as BankingTable } from './base/BankingTable.vue';
+export { default as BankingTableCell } from './base/BankingTableCell.vue';
 
 // Banking-Specific Components
-export { default as ApprovalWorkflow } from './banking/ApprovalWorkflow.vue'
-export { default as AuditTrail } from './banking/AuditTrail.vue'
+export { default as ApprovalWorkflow } from './banking/ApprovalWorkflow.vue';
+export { default as AuditTrail } from './banking/AuditTrail.vue';
 
 // Showcase Component
-export { default as DesignSystemShowcase } from './showcase/DesignSystemShowcase.vue'
+export { default as DesignSystemShowcase } from './showcase/DesignSystemShowcase.vue';
 
 // Type Exports - Base Components
 export type {
@@ -27,8 +27,8 @@ export type {
   BankingButtonEmits,
   BankingButtonClickEvent,
   ConfirmationDialogOptions,
-  BankingButtonSlots
-} from './base/BankingButton.types'
+  BankingButtonSlots,
+} from './base/BankingButton.types';
 
 export type {
   BankingInputProps,
@@ -36,8 +36,8 @@ export type {
   ValidationResult,
   BankingValidators,
   BankingInputSlots,
-  FormattingOptions
-} from './base/BankingInput.types'
+  FormattingOptions,
+} from './base/BankingInput.types';
 
 export type {
   BankingTableProps,
@@ -47,8 +47,8 @@ export type {
   BankingColumnFormat,
   TableOptions,
   ExportOptions,
-  BankingTableCellProps
-} from './base/BankingTable.types'
+  BankingTableCellProps,
+} from './base/BankingTable.types';
 
 // Type Exports - Banking Components
 export type {
@@ -66,8 +66,8 @@ export type {
   ExportApprovalEvent,
   WorkflowConfig,
   WorkflowTemplate,
-  WorkflowAnalytics
-} from './banking/ApprovalWorkflow.types'
+  WorkflowAnalytics,
+} from './banking/ApprovalWorkflow.types';
 
 export type {
   AuditTrailProps,
@@ -77,8 +77,8 @@ export type {
   AuditFilters,
   AuditExportRequest,
   AuditTrailConfig,
-  AuditTrailAnalytics
-} from './banking/AuditTrail.types'
+  AuditTrailAnalytics,
+} from './banking/AuditTrail.types';
 
 /**
  * Design System Configuration
@@ -87,18 +87,18 @@ export interface DesignSystemConfig {
   /**
    * Default theme (light/dark)
    */
-  theme: 'light' | 'dark'
-  
+  theme: 'light' | 'dark';
+
   /**
    * Default currency for currency inputs
    */
-  defaultCurrency: string
-  
+  defaultCurrency: string;
+
   /**
    * Default locale for formatting
    */
-  defaultLocale: string
-  
+  defaultLocale: string;
+
   /**
    * Accessibility features
    */
@@ -106,19 +106,19 @@ export interface DesignSystemConfig {
     /**
      * Enable high contrast mode
      */
-    highContrast: boolean
-    
+    highContrast: boolean;
+
     /**
      * Enable reduced motion
      */
-    reducedMotion: boolean
-    
+    reducedMotion: boolean;
+
     /**
      * Enable screen reader optimizations
      */
-    screenReader: boolean
-  }
-  
+    screenReader: boolean;
+  };
+
   /**
    * Banking-specific settings
    */
@@ -126,23 +126,23 @@ export interface DesignSystemConfig {
     /**
      * Default decimal places for currency
      */
-    currencyDecimals: number
-    
+    currencyDecimals: number;
+
     /**
      * Default decimal places for percentages
      */
-    percentageDecimals: number
-    
+    percentageDecimals: number;
+
     /**
      * Enable audit trail by default
      */
-    enableAuditTrail: boolean
-    
+    enableAuditTrail: boolean;
+
     /**
      * Default approval workflow timeout (hours)
      */
-    approvalTimeout: number
-  }
+    approvalTimeout: number;
+  };
 }
 
 /**
@@ -155,37 +155,27 @@ export const defaultConfig: DesignSystemConfig = {
   accessibility: {
     highContrast: false,
     reducedMotion: false,
-    screenReader: true
+    screenReader: true,
   },
   banking: {
     currencyDecimals: 2,
     percentageDecimals: 2,
     enableAuditTrail: true,
-    approvalTimeout: 48
-  }
-}
+    approvalTimeout: 48,
+  },
+};
 
 /**
  * Component categories for organization
  */
 export const componentCategories = {
-  base: [
-    'BankingButton',
-    'BankingInput', 
-    'BankingTable',
-    'BankingTableCell'
-  ],
-  banking: [
-    'ApprovalWorkflow',
-    'AuditTrail'
-  ],
+  base: ['BankingButton', 'BankingInput', 'BankingTable', 'BankingTableCell'],
+  banking: ['ApprovalWorkflow', 'AuditTrail'],
   layout: [
     // Future layout components
   ],
-  utility: [
-    'DesignSystemShowcase'
-  ]
-} as const
+  utility: ['DesignSystemShowcase'],
+} as const;
 
 /**
  * Accessibility compliance information
@@ -201,16 +191,16 @@ export const accessibilityCompliance = {
     'ARIA labels and roles',
     'Color contrast compliance',
     'Text scaling support (up to 200%)',
-    'Reduced motion support'
+    'Reduced motion support',
   ],
   testing: [
     'Automated accessibility testing',
     'Manual keyboard testing',
     'Screen reader testing (NVDA, JAWS, VoiceOver)',
     'Color contrast validation',
-    'Mobile accessibility testing'
-  ]
-} as const
+    'Mobile accessibility testing',
+  ],
+} as const;
 
 /**
  * Banking industry compliance information
@@ -221,7 +211,7 @@ export const bankingCompliance = {
     'FFIEC Guidelines (IT Risk Management)',
     'Basel III (Operational Risk)',
     'GDPR Article 32 (Security of Processing)',
-    'PCI DSS (Payment Card Industry)'
+    'PCI DSS (Payment Card Industry)',
   ],
   features: [
     'Audit trail logging',
@@ -231,69 +221,69 @@ export const bankingCompliance = {
     'Session management',
     'Secure input handling',
     'Change tracking',
-    'Compliance reporting'
-  ]
-} as const
+    'Compliance reporting',
+  ],
+} as const;
 
 /**
  * Theme configuration
  */
 export interface ThemeConfig {
   colors: {
-    primary: string
-    secondary: string
-    success: string
-    warning: string
-    error: string
-    info: string
-    surface: string
-    background: string
-  }
+    primary: string;
+    secondary: string;
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+    surface: string;
+    background: string;
+  };
   typography: {
-    fontFamily: string
+    fontFamily: string;
     fontSize: {
-      xs: string
-      sm: string
-      base: string
-      lg: string
-      xl: string
-    }
-  }
+      xs: string;
+      sm: string;
+      base: string;
+      lg: string;
+      xl: string;
+    };
+  };
   spacing: {
-    xs: string
-    sm: string
-    md: string
-    lg: string
-    xl: string
-  }
+    xs: string;
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+  };
   borderRadius: {
-    sm: string
-    md: string
-    lg: string
-  }
+    sm: string;
+    md: string;
+    lg: string;
+  };
 }
 
 /**
  * Component usage statistics for optimization
  */
 export interface UsageStats {
-  component: string
-  usageCount: number
-  lastUsed: Date
-  averageRenderTime: number
-  bundleSize: number
+  component: string;
+  usageCount: number;
+  lastUsed: Date;
+  averageRenderTime: number;
+  bundleSize: number;
 }
 
 /**
  * Performance metrics
  */
 export interface PerformanceMetrics {
-  totalComponents: number
-  bundleSize: string
-  treeShakeable: boolean
-  lazyLoadable: boolean
-  averageRenderTime: number
-  memoryUsage: string
+  totalComponents: number;
+  bundleSize: string;
+  treeShakeable: boolean;
+  lazyLoadable: boolean;
+  averageRenderTime: number;
+  memoryUsage: string;
 }
 
 /**
@@ -308,10 +298,10 @@ export const designSystemMetadata = {
   dependencies: {
     vue: '^3.5.17',
     vuetify: '^3.7.9',
-    typescript: '~5.8.0'
+    typescript: '~5.8.0',
   },
   peerDependencies: {
-    '@mdi/font': '^7.4.47'
+    '@mdi/font': '^7.4.47',
   },
   features: [
     'Banking-specific components',
@@ -322,6 +312,6 @@ export const designSystemMetadata = {
     'Comprehensive documentation',
     'Interactive component showcase',
     'Automated testing',
-    'Performance optimized'
-  ]
-} as const
+    'Performance optimized',
+  ],
+} as const;

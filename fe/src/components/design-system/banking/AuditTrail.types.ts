@@ -1,6 +1,6 @@
 /**
  * Audit Trail Component Types
- * 
+ *
  * Comprehensive type definitions for banking audit trail components
  * with detailed tracking, filtering, and compliance features.
  */
@@ -12,53 +12,53 @@ export interface AuditEntry {
   /**
    * Unique identifier for the audit entry
    */
-  id: string
-  
+  id: string;
+
   /**
    * Action that was performed
    */
-  action: string
-  
+  action: string;
+
   /**
    * Optional description of the action
    */
-  description?: string
-  
+  description?: string;
+
   /**
    * User who performed the action
    */
-  user: string
-  
+  user: string;
+
   /**
    * Timestamp when the action was performed
    */
-  timestamp: Date | string
-  
+  timestamp: Date | string;
+
   /**
    * Target of the action (e.g., document ID, user ID)
    */
-  target?: string
-  
+  target?: string;
+
   /**
    * Category of the action
    */
-  category?: 'security' | 'financial' | 'compliance' | 'user' | 'system' | 'data'
-  
+  category?: 'security' | 'financial' | 'compliance' | 'user' | 'system' | 'data';
+
   /**
    * Risk level assessment
    */
-  riskLevel?: 'low' | 'medium' | 'high'
-  
+  riskLevel?: 'low' | 'medium' | 'high';
+
   /**
    * Additional details about the action
    */
-  details?: Record<string, any>
-  
+  details?: Record<string, any>;
+
   /**
    * Changes made (for update actions)
    */
-  changes?: AuditChange[]
-  
+  changes?: AuditChange[];
+
   /**
    * Additional metadata
    */
@@ -66,33 +66,33 @@ export interface AuditEntry {
     /**
      * IP address from which the action was performed
      */
-    ipAddress?: string
-    
+    ipAddress?: string;
+
     /**
      * Geographic location
      */
-    location?: string
-    
+    location?: string;
+
     /**
      * User agent string
      */
-    userAgent?: string
-    
+    userAgent?: string;
+
     /**
      * Session ID
      */
-    sessionId?: string
-    
+    sessionId?: string;
+
     /**
      * Request ID for tracing
      */
-    requestId?: string
-    
+    requestId?: string;
+
     /**
      * Additional custom metadata
      */
-    [key: string]: any
-  }
+    [key: string]: any;
+  };
 }
 
 /**
@@ -102,22 +102,22 @@ export interface AuditChange {
   /**
    * Field that was changed
    */
-  field: string
-  
+  field: string;
+
   /**
    * Previous value
    */
-  oldValue: any
-  
+  oldValue: any;
+
   /**
    * New value
    */
-  newValue: any
-  
+  newValue: any;
+
   /**
    * Data type of the field
    */
-  dataType?: string
+  dataType?: string;
 }
 
 /**
@@ -127,42 +127,42 @@ export interface AuditFilters {
   /**
    * Filter by user
    */
-  user: string
-  
+  user: string;
+
   /**
    * Filter by action
    */
-  action: string
-  
+  action: string;
+
   /**
    * Filter by date range - from
    */
-  dateFrom: string
-  
+  dateFrom: string;
+
   /**
    * Filter by date range - to
    */
-  dateTo: string
-  
+  dateTo: string;
+
   /**
    * Filter by risk level
    */
-  riskLevel: string
-  
+  riskLevel: string;
+
   /**
    * Filter by IP address
    */
-  ipAddress: string
-  
+  ipAddress: string;
+
   /**
    * Filter by category
    */
-  category?: string
-  
+  category?: string;
+
   /**
    * Filter by target
    */
-  target?: string
+  target?: string;
 }
 
 /**
@@ -172,27 +172,27 @@ export interface AuditExportRequest {
   /**
    * Entries to export
    */
-  entries: AuditEntry[]
-  
+  entries: AuditEntry[];
+
   /**
    * Filters applied
    */
-  filters: AuditFilters
-  
+  filters: AuditFilters;
+
   /**
    * Export timestamp
    */
-  timestamp: Date
-  
+  timestamp: Date;
+
   /**
    * Export format
    */
-  format?: 'csv' | 'excel' | 'pdf' | 'json'
-  
+  format?: 'csv' | 'excel' | 'pdf' | 'json';
+
   /**
    * Include metadata in export
    */
-  includeMetadata?: boolean
+  includeMetadata?: boolean;
 }
 
 /**
@@ -202,77 +202,77 @@ export interface AuditTrailProps {
   /**
    * Array of audit entries
    */
-  entries?: AuditEntry[]
-  
+  entries?: AuditEntry[];
+
   /**
    * Component title
    */
-  title?: string
-  
+  title?: string;
+
   /**
    * Component subtitle
    */
-  subtitle?: string
-  
+  subtitle?: string;
+
   /**
    * Component variant for styling
    */
-  variant?: 'default' | 'compact' | 'detailed'
-  
+  variant?: 'default' | 'compact' | 'detailed';
+
   /**
    * Whether to show the header
    */
-  showHeader?: boolean
-  
+  showHeader?: boolean;
+
   /**
    * Whether to show summary information
    */
-  showSummary?: boolean
-  
+  showSummary?: boolean;
+
   /**
    * Whether to show detailed entry information
    */
-  showDetails?: boolean
-  
+  showDetails?: boolean;
+
   /**
    * Whether filtering is enabled
    */
-  filterable?: boolean
-  
+  filterable?: boolean;
+
   /**
    * Whether export functionality is enabled
    */
-  exportable?: boolean
-  
+  exportable?: boolean;
+
   /**
    * Whether refresh functionality is enabled
    */
-  refreshable?: boolean
-  
+  refreshable?: boolean;
+
   /**
    * Number of items per page
    */
-  itemsPerPage?: number
-  
+  itemsPerPage?: number;
+
   /**
    * Whether entries are grouped by date
    */
-  groupByDate?: boolean
-  
+  groupByDate?: boolean;
+
   /**
    * Loading state
    */
-  loading?: boolean
-  
+  loading?: boolean;
+
   /**
    * No data text
    */
-  noDataText?: string
-  
+  noDataText?: string;
+
   /**
    * Custom CSS classes
    */
-  class?: string | string[] | Record<string, boolean>
+  class?: string | string[] | Record<string, boolean>;
 }
 
 /**
@@ -282,42 +282,42 @@ export interface AuditTrailEmits {
   /**
    * Emitted when an audit entry is selected
    */
-  (event: 'entry-selected', entry: AuditEntry): void
-  
+  (event: 'entry-selected', entry: AuditEntry): void;
+
   /**
    * Emitted when filters change
    */
-  (event: 'filters-changed', filters: AuditFilters): void
-  
+  (event: 'filters-changed', filters: AuditFilters): void;
+
   /**
    * Emitted when filters are cleared
    */
-  (event: 'filters-cleared'): void
-  
+  (event: 'filters-cleared'): void;
+
   /**
    * Emitted when page changes
    */
-  (event: 'page-changed', page: number): void
-  
+  (event: 'page-changed', page: number): void;
+
   /**
    * Emitted when export is requested
    */
-  (event: 'export-requested', request: AuditExportRequest): void
-  
+  (event: 'export-requested', request: AuditExportRequest): void;
+
   /**
    * Emitted when refresh is requested
    */
-  (event: 'refresh-requested'): void
-  
+  (event: 'refresh-requested'): void;
+
   /**
    * Emitted when entry details are expanded
    */
-  (event: 'entry-expanded', entry: AuditEntry): void
-  
+  (event: 'entry-expanded', entry: AuditEntry): void;
+
   /**
    * Emitted when entry details are collapsed
    */
-  (event: 'entry-collapsed', entry: AuditEntry): void
+  (event: 'entry-collapsed', entry: AuditEntry): void;
 }
 
 /**
@@ -327,42 +327,42 @@ export interface AuditTrailConfig {
   /**
    * Default items per page
    */
-  defaultItemsPerPage?: number
-  
+  defaultItemsPerPage?: number;
+
   /**
    * Maximum entries to display
    */
-  maxEntries?: number
-  
+  maxEntries?: number;
+
   /**
    * Default date range filter (days)
    */
-  defaultDateRange?: number
-  
+  defaultDateRange?: number;
+
   /**
    * Auto-refresh interval (milliseconds)
    */
-  autoRefreshInterval?: number
-  
+  autoRefreshInterval?: number;
+
   /**
    * Retention policy (days)
    */
-  retentionDays?: number
-  
+  retentionDays?: number;
+
   /**
    * High-risk action patterns
    */
-  highRiskPatterns?: string[]
-  
+  highRiskPatterns?: string[];
+
   /**
    * Medium-risk action patterns
    */
-  mediumRiskPatterns?: string[]
-  
+  mediumRiskPatterns?: string[];
+
   /**
    * Sensitive field patterns
    */
-  sensitiveFields?: string[]
+  sensitiveFields?: string[];
 }
 
 /**
@@ -372,54 +372,54 @@ export interface AuditTrailAnalytics {
   /**
    * Total entries in the time period
    */
-  totalEntries: number
-  
+  totalEntries: number;
+
   /**
    * Entries by risk level
    */
   entriesByRisk: {
-    low: number
-    medium: number
-    high: number
-  }
-  
+    low: number;
+    medium: number;
+    high: number;
+  };
+
   /**
    * Entries by category
    */
-  entriesByCategory: Record<string, number>
-  
+  entriesByCategory: Record<string, number>;
+
   /**
    * Top users by activity
    */
   topUsers: Array<{
-    user: string
-    count: number
-    percentage: number
-  }>
-  
+    user: string;
+    count: number;
+    percentage: number;
+  }>;
+
   /**
    * Top actions performed
    */
   topActions: Array<{
-    action: string
-    count: number
-    percentage: number
-  }>
-  
+    action: string;
+    count: number;
+    percentage: number;
+  }>;
+
   /**
    * Activity timeline (hourly)
    */
   activityTimeline: Array<{
-    hour: number
-    count: number
-  }>
-  
+    hour: number;
+    count: number;
+  }>;
+
   /**
    * Geographic distribution
    */
   geographicDistribution: Array<{
-    location: string
-    count: number
-    percentage: number
-  }>
+    location: string;
+    count: number;
+    percentage: number;
+  }>;
 }

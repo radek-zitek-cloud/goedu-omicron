@@ -1,6 +1,6 @@
 /**
  * Banking Button Component Types
- * 
+ *
  * Comprehensive type definitions for the banking-specific button component.
  * Supports various banking workflows and accessibility requirements.
  */
@@ -10,89 +10,96 @@ export interface BankingButtonProps {
    * Button variant determining the visual style and semantic meaning
    * @default 'primary'
    */
-  variant?: 'primary' | 'secondary' | 'approve' | 'reject' | 'warning' | 'text' | 'outlined'
-  
+  variant?: 'primary' | 'secondary' | 'approve' | 'reject' | 'warning' | 'text' | 'outlined';
+
   /**
    * Button size for different contexts and device types
    * @default 'default'
    */
-  size?: 'small' | 'default' | 'large' | 'x-large'
-  
+  size?: 'small' | 'default' | 'large' | 'x-large';
+
   /**
    * Banking-specific action types for enhanced semantics
    */
-  actionType?: 'submit' | 'approve' | 'reject' | 'cancel' | 'save-draft' | 'send-reminder' | 'export'
-  
+  actionType?:
+    | 'submit'
+    | 'approve'
+    | 'reject'
+    | 'cancel'
+    | 'save-draft'
+    | 'send-reminder'
+    | 'export';
+
   /**
    * Disable state with optional reason for accessibility
    */
-  disabled?: boolean
-  
+  disabled?: boolean;
+
   /**
    * Reason for disabled state (used for accessibility)
    */
-  disabledReason?: string
-  
+  disabledReason?: string;
+
   /**
    * Loading state for async operations
    */
-  loading?: boolean
-  
+  loading?: boolean;
+
   /**
    * Show confirmation dialog before action
    */
-  requireConfirmation?: boolean
-  
+  requireConfirmation?: boolean;
+
   /**
    * Confirmation dialog message
    */
-  confirmationMessage?: string
-  
+  confirmationMessage?: string;
+
   /**
    * Icon to display (Material Design Icons name)
    */
-  icon?: string
-  
+  icon?: string;
+
   /**
    * Position of the icon relative to text
    * @default 'start'
    */
-  iconPosition?: 'start' | 'end'
-  
+  iconPosition?: 'start' | 'end';
+
   /**
    * Full width button (useful for mobile)
    */
-  block?: boolean
-  
+  block?: boolean;
+
   /**
    * Elevated appearance with shadow
    */
-  elevated?: boolean
-  
+  elevated?: boolean;
+
   /**
    * Custom color (overrides variant colors)
    */
-  color?: string
-  
+  color?: string;
+
   /**
    * Accessibility label when button text is not descriptive enough
    */
-  ariaLabel?: string
-  
+  ariaLabel?: string;
+
   /**
    * ARIA describedby for additional context
    */
-  ariaDescribedby?: string
-  
+  ariaDescribedby?: string;
+
   /**
    * Custom CSS classes
    */
-  class?: string | string[] | Record<string, boolean>
-  
+  class?: string | string[] | Record<string, boolean>;
+
   /**
    * Custom styles
    */
-  style?: string | Record<string, string | number>
+  style?: string | Record<string, string | number>;
 }
 
 /**
@@ -102,22 +109,22 @@ export interface BankingButtonClickEvent {
   /**
    * Original mouse/keyboard event
    */
-  originalEvent: Event
-  
+  originalEvent: Event;
+
   /**
    * Button action type
    */
-  actionType?: string
-  
+  actionType?: string;
+
   /**
    * Timestamp of the action
    */
-  timestamp: Date
-  
+  timestamp: Date;
+
   /**
    * Whether confirmation was required and accepted
    */
-  confirmed?: boolean
+  confirmed?: boolean;
 }
 
 /**
@@ -127,35 +134,35 @@ export interface ConfirmationDialogOptions {
   /**
    * Dialog title
    */
-  title?: string
-  
+  title?: string;
+
   /**
    * Confirmation message
    */
-  message: string
-  
+  message: string;
+
   /**
    * Confirm button text
    * @default 'Confirm'
    */
-  confirmText?: string
-  
+  confirmText?: string;
+
   /**
    * Cancel button text
    * @default 'Cancel'
    */
-  cancelText?: string
-  
+  cancelText?: string;
+
   /**
    * Dialog severity level
    * @default 'info'
    */
-  severity?: 'info' | 'warning' | 'error'
-  
+  severity?: 'info' | 'warning' | 'error';
+
   /**
    * Whether to show additional warning for destructive actions
    */
-  destructive?: boolean
+  destructive?: boolean;
 }
 
 /**
@@ -165,22 +172,22 @@ export interface BankingButtonEmits {
   /**
    * Emitted when button is clicked (after confirmation if required)
    */
-  (event: 'click', payload: BankingButtonClickEvent): void
-  
+  (event: 'click', payload: BankingButtonClickEvent): void;
+
   /**
    * Emitted when confirmation dialog is shown
    */
-  (event: 'confirmation-shown'): void
-  
+  (event: 'confirmation-shown'): void;
+
   /**
    * Emitted when confirmation is accepted
    */
-  (event: 'confirmation-accepted'): void
-  
+  (event: 'confirmation-accepted'): void;
+
   /**
    * Emitted when confirmation is rejected
    */
-  (event: 'confirmation-rejected'): void
+  (event: 'confirmation-rejected'): void;
 }
 
 /**
@@ -190,15 +197,15 @@ export interface BankingButtonSlots {
   /**
    * Default slot for button content
    */
-  default: () => any
-  
+  default: () => any;
+
   /**
    * Icon slot for custom icons
    */
-  icon?: () => any
-  
+  icon?: () => any;
+
   /**
    * Loading slot for custom loading indicators
    */
-  loading?: () => any
+  loading?: () => any;
 }

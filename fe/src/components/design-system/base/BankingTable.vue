@@ -6,7 +6,7 @@
         <h3 v-if="title" class="banking-table__title">{{ title }}</h3>
         <p v-if="subtitle" class="banking-table__subtitle">{{ subtitle }}</p>
       </div>
-      
+
       <div class="banking-table__actions">
         <slot name="header-actions">
           <BankingButton
@@ -18,7 +18,7 @@
           >
             Export
           </BankingButton>
-          
+
           <BankingButton
             v-if="refreshable"
             variant="text"
@@ -46,7 +46,7 @@
         clearable
         @input="handleSearch"
       />
-      
+
       <div v-if="filterable" class="banking-table__filters">
         <slot name="filters" />
       </div>
@@ -83,12 +83,7 @@
         :key="header.key"
         #[`item.${header.key}`]="{ item, value }"
       >
-        <slot
-          :name="`item.${header.key}`"
-          :item="item"
-          :value="value"
-          :header="header"
-        >
+        <slot :name="`item.${header.key}`" :item="item" :value="value" :header="header">
           <!-- Banking-specific column rendering -->
           <BankingTableCell
             :value="value"
@@ -116,10 +111,7 @@
       <!-- Loading state -->
       <template #loading>
         <slot name="loading">
-          <VSkeletonLoader
-            type="table-row-divider@6"
-            class="banking-table__loading"
-          />
+          <VSkeletonLoader type="table-row-divider@6" class="banking-table__loading" />
         </slot>
       </template>
 
@@ -142,7 +134,7 @@
               Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ totalItems }} items
             </span>
           </div>
-          
+
           <VPagination
             v-if="totalPages > 1"
             :model-value="currentPage"
@@ -157,30 +149,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, type PropType } from 'vue'
-import {
-  VDataTable,
-  VIcon,
-  VSkeletonLoader,
-  VPagination
-} from 'vuetify/components'
-import BankingButton from './BankingButton.vue'
-import BankingInput from './BankingInput.vue'
-import BankingTableCell from './BankingTableCell.vue'
+import { computed, ref, watch, type PropType } from 'vue';
+import { VDataTable, VIcon, VSkeletonLoader, VPagination } from 'vuetify/components';
+import BankingButton from './BankingButton.vue';
+import BankingInput from './BankingInput.vue';
+import BankingTableCell from './BankingTableCell.vue';
 import type {
   BankingTableProps,
   BankingTableEmits,
   BankingTableHeader,
   BankingTableItem,
-  TableOptions
-} from './BankingTable.types'
+  TableOptions,
+} from './BankingTable.types';
 
 /**
  * Banking Data Table Component
- * 
+ *
  * A comprehensive data table component designed for banking applications
  * with advanced filtering, sorting, pagination, and accessibility features.
- * 
+ *
  * Features:
  * - Banking-specific column types (currency, percentage, status)
  * - Advanced search and filtering
@@ -188,7 +175,7 @@ import type {
  * - Responsive design
  * - WCAG 2.1 AA compliant
  * - Audit trail integration
- * 
+ *
  * @example
  * <BankingTable
  *   :headers="transactionHeaders"
@@ -218,17 +205,17 @@ const props = withDefaults(defineProps<BankingTableProps>(), {
   multiSort: false,
   mobileBreakpoint: 960,
   totalVisible: 7,
-  serverMode: false
-})
+  serverMode: false,
+});
 
 // Events
-const emit = defineEmits<BankingTableEmits>()
+const emit = defineEmits<BankingTableEmits>();
 
 // Reactive state
-const searchQuery = ref('')
-const selectedItems = ref<BankingTableItem[]>([])
-const expandedItems = ref<string[]>([])
-const currentPage = ref(1)
+const searchQuery = ref('');
+const selectedItems = ref<BankingTableItem[]>([]);
+const expandedItems = ref<string[]>([]);
+const currentPage = ref(1);
 
 /**
  * Computed properties
@@ -237,69 +224,61 @@ const computedHeaders = computed(() => {
   return props.headers.map(header => ({
     ...header,
     sortable: header.sortable !== false && props.sortable,
-    align: header.align || getDefaultAlign(header.type)
-  }))
-})
+    align: header.align || getDefaultAlign(header.type),
+  }));
+});
 
 const computedItems = computed(() => {
-  let items = props.items || []
-  
+  let items = props.items || [];
+
   // Apply search filter
   if (searchQuery.value && props.searchable) {
-    const query = searchQuery.value.toLowerCase()
-    items = items.filter(item => 
-      Object.values(item).some(value => 
-        String(value).toLowerCase().includes(query)
-      )
-    )
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter(item =>
+      Object.values(item).some(value => String(value).toLowerCase().includes(query))
+    );
   }
-  
-  return items
-})
+
+  return items;
+});
 
 const computedClasses = computed(() => {
-  const classes: string[] = ['banking-table']
-  
+  const classes: string[] = ['banking-table'];
+
   if (props.variant) {
-    classes.push(`banking-table--${props.variant}`)
+    classes.push(`banking-table--${props.variant}`);
   }
-  
+
   if (props.class) {
     if (typeof props.class === 'string') {
-      classes.push(props.class)
+      classes.push(props.class);
     } else if (Array.isArray(props.class)) {
-      classes.push(...props.class)
+      classes.push(...props.class);
     } else {
       Object.entries(props.class).forEach(([className, condition]) => {
-        if (condition) classes.push(className)
-      })
+        if (condition) classes.push(className);
+      });
     }
   }
-  
-  return classes
-})
+
+  return classes;
+});
 
 const tableClasses = computed(() => [
   'banking-table__data-table',
   { 'banking-table__data-table--striped': props.striped },
-  { 'banking-table__data-table--hover': props.hover }
-])
+  { 'banking-table__data-table--hover': props.hover },
+]);
 
-const totalItems = computed(() => 
-  props.serverMode ? (props.totalItems || 0) : computedItems.value.length
-)
+const totalItems = computed(() =>
+  props.serverMode ? props.totalItems || 0 : computedItems.value.length
+);
 
-const totalPages = computed(() => 
-  Math.ceil(totalItems.value / props.itemsPerPage)
-)
+const totalPages = computed(() => Math.ceil(totalItems.value / props.itemsPerPage));
 
-const startIndex = computed(() => 
-  (currentPage.value - 1) * props.itemsPerPage
-)
+const startIndex = computed(() => (currentPage.value - 1) * props.itemsPerPage);
 
-const endIndex = computed(() => 
-  Math.min(startIndex.value + props.itemsPerPage, totalItems.value)
-)
+const endIndex = computed(() => Math.min(startIndex.value + props.itemsPerPage, totalItems.value));
 
 /**
  * Get default column alignment based on type
@@ -309,13 +288,13 @@ function getDefaultAlign(type?: string): 'start' | 'center' | 'end' {
     case 'currency':
     case 'percentage':
     case 'number':
-      return 'end'
+      return 'end';
     case 'status':
     case 'boolean':
     case 'actions':
-      return 'center'
+      return 'center';
     default:
-      return 'start'
+      return 'start';
   }
 }
 
@@ -323,49 +302,53 @@ function getDefaultAlign(type?: string): 'start' | 'center' | 'end' {
  * Event handlers
  */
 function handleSearch(value: string | number): void {
-  const searchValue = String(value)
-  searchQuery.value = searchValue
-  currentPage.value = 1
-  emit('search', searchValue)
+  const searchValue = String(value);
+  searchQuery.value = searchValue;
+  currentPage.value = 1;
+  emit('search', searchValue);
 }
 
 function handleRowClick(event: Event, { item }: { item: BankingTableItem }): void {
-  emit('row-click', item, event)
+  emit('row-click', item, event);
 }
 
 function handleOptionsUpdate(options: TableOptions): void {
-  emit('options-update', options)
+  emit('options-update', options);
 }
 
 function handleItemsPerPageUpdate(itemsPerPage: number): void {
-  emit('items-per-page-update', itemsPerPage)
+  emit('items-per-page-update', itemsPerPage);
 }
 
 function handleSortUpdate(sortBy: any[]): void {
-  emit('sort-update', sortBy)
+  emit('sort-update', sortBy);
 }
 
 function handlePageUpdate(page: number): void {
-  currentPage.value = page
-  emit('page-update', page)
+  currentPage.value = page;
+  emit('page-update', page);
 }
 
 function handleExport(): void {
-  emit('export', computedItems.value)
+  emit('export', computedItems.value);
 }
 
 function handleRefresh(): void {
-  emit('refresh')
+  emit('refresh');
 }
 
 /**
  * Watch for external changes
  */
-watch(() => props.page, (newPage) => {
-  if (newPage !== undefined && newPage !== currentPage.value) {
-    currentPage.value = newPage
-  }
-}, { immediate: true })
+watch(
+  () => props.page,
+  newPage => {
+    if (newPage !== undefined && newPage !== currentPage.value) {
+      currentPage.value = newPage;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
@@ -487,17 +470,17 @@ watch(() => props.page, (newPage) => {
     gap: 16px;
     align-items: stretch;
   }
-  
+
   .banking-table__controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .banking-table__search {
     min-width: unset;
     max-width: unset;
   }
-  
+
   .banking-table__footer {
     flex-direction: column;
     gap: 12px;
@@ -510,7 +493,7 @@ watch(() => props.page, (newPage) => {
   .banking-table__footer {
     padding: 12px 16px;
   }
-  
+
   .banking-table__expanded-content {
     padding: 12px 16px;
   }
@@ -521,7 +504,7 @@ watch(() => props.page, (newPage) => {
   .banking-table {
     border: 2px solid rgb(var(--v-theme-outline));
   }
-  
+
   .banking-table__header,
   .banking-table__controls,
   .banking-table__footer {

@@ -6,18 +6,14 @@
         <h3 class="approval-workflow__title">{{ title || 'Approval Workflow' }}</h3>
         <p v-if="description" class="approval-workflow__description">{{ description }}</p>
       </div>
-      
+
       <div class="approval-workflow__status">
         <VChip
           :color="getWorkflowStatusColor()"
           :variant="workflowStatus === 'completed' ? 'flat' : 'tonal'"
           size="large"
         >
-          <VIcon
-            :icon="getWorkflowStatusIcon()"
-            start
-            size="small"
-          />
+          <VIcon :icon="getWorkflowStatusIcon()" start size="small" />
           {{ getWorkflowStatusText() }}
         </VChip>
       </div>
@@ -53,12 +49,9 @@
             :variant="getStepVariant(step, index)"
             size="40"
           >
-            <VIcon
-              :icon="getStepIcon(step, index)"
-              :color="getStepIconColor(step, index)"
-            />
+            <VIcon :icon="getStepIcon(step, index)" :color="getStepIconColor(step, index)" />
           </VAvatar>
-          
+
           <!-- Connecting Line -->
           <div
             v-if="index < steps.length - 1"
@@ -78,7 +71,7 @@
               </span>
             </div>
           </div>
-          
+
           <p v-if="step.description" class="approval-workflow__step-description">
             {{ step.description }}
           </p>
@@ -119,7 +112,7 @@
                 >
                   Approve
                 </BankingButton>
-                
+
                 <BankingButton
                   v-if="step.allowReject"
                   variant="reject"
@@ -131,7 +124,7 @@
                 >
                   Reject
                 </BankingButton>
-                
+
                 <BankingButton
                   v-if="step.allowDelegate"
                   variant="outlined"
@@ -146,7 +139,10 @@
           </div>
 
           <!-- Step History -->
-          <div v-if="step.history && step.history.length > 0" class="approval-workflow__step-history">
+          <div
+            v-if="step.history && step.history.length > 0"
+            class="approval-workflow__step-history"
+          >
             <VExpansionPanels variant="accordion" flat>
               <VExpansionPanel>
                 <VExpansionPanelTitle>
@@ -162,7 +158,9 @@
                     <div class="approval-workflow__history-header">
                       <strong>{{ entry.action }}</strong>
                       <span class="approval-workflow__history-user">by {{ entry.user }}</span>
-                      <span class="approval-workflow__history-date">{{ formatDateTime(entry.timestamp) }}</span>
+                      <span class="approval-workflow__history-date">{{
+                        formatDateTime(entry.timestamp)
+                      }}</span>
                     </div>
                     <p v-if="entry.comment" class="approval-workflow__history-comment">
                       {{ entry.comment }}
@@ -199,7 +197,7 @@
       >
         Start Workflow
       </BankingButton>
-      
+
       <BankingButton
         v-if="canCancelWorkflow"
         variant="warning"
@@ -210,7 +208,7 @@
       >
         Cancel Workflow
       </BankingButton>
-      
+
       <BankingButton
         v-if="workflowStatus === 'completed'"
         variant="outlined"
@@ -224,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from 'vue'
+import { computed, ref, type PropType } from 'vue';
 import {
   VChip,
   VIcon,
@@ -234,22 +232,22 @@ import {
   VExpansionPanel,
   VExpansionPanelTitle,
   VExpansionPanelText,
-  VTextarea
-} from 'vuetify/components'
-import BankingButton from '../base/BankingButton.vue'
+  VTextarea,
+} from 'vuetify/components';
+import BankingButton from '../base/BankingButton.vue';
 import type {
   ApprovalWorkflowProps,
   ApprovalWorkflowEmits,
   ApprovalStep,
-  WorkflowStatus
-} from './ApprovalWorkflow.types'
+  WorkflowStatus,
+} from './ApprovalWorkflow.types';
 
 /**
  * Approval Workflow Component
- * 
+ *
  * A comprehensive workflow component for banking approval processes with
  * step tracking, user assignments, due dates, and audit trail functionality.
- * 
+ *
  * Features:
  * - Multi-step approval process
  * - Role-based access control
@@ -258,7 +256,7 @@ import type {
  * - Delegation and escalation support
  * - WCAG 2.1 AA compliant
  * - Responsive design
- * 
+ *
  * @example
  * <ApprovalWorkflow
  *   :steps="approvalSteps"
@@ -277,212 +275,237 @@ const props = withDefaults(defineProps<ApprovalWorkflowProps>(), {
   allowComments: true,
   showWorkflowActions: true,
   strictSequence: true,
-  autoProgress: true
-})
+  autoProgress: true,
+});
 
 // Events
-const emit = defineEmits<ApprovalWorkflowEmits>()
+const emit = defineEmits<ApprovalWorkflowEmits>();
 
 // Reactive state
-const currentComment = ref('')
+const currentComment = ref('');
 
 /**
  * Computed properties
  */
 const computedClasses = computed(() => {
-  const classes: string[] = ['approval-workflow']
-  
-  classes.push(`approval-workflow--${props.workflowStatus}`)
-  
+  const classes: string[] = ['approval-workflow'];
+
+  classes.push(`approval-workflow--${props.workflowStatus}`);
+
   if (props.variant) {
-    classes.push(`approval-workflow--${props.variant}`)
+    classes.push(`approval-workflow--${props.variant}`);
   }
-  
+
   if (props.class) {
     if (typeof props.class === 'string') {
-      classes.push(props.class)
+      classes.push(props.class);
     } else if (Array.isArray(props.class)) {
-      classes.push(...props.class)
+      classes.push(...props.class);
     } else {
       Object.entries(props.class).forEach(([className, condition]) => {
-        if (condition) classes.push(className)
-      })
+        if (condition) classes.push(className);
+      });
     }
   }
-  
-  return classes
-})
 
-const currentStepIndex = computed(() => props.currentStep)
+  return classes;
+});
+
+const currentStepIndex = computed(() => props.currentStep);
 
 const completedSteps = computed(() => {
-  return props.steps.filter(step => step.status === 'completed').length
-})
+  return props.steps.filter(step => step.status === 'completed').length;
+});
 
 const progressPercentage = computed(() => {
-  if (props.steps.length === 0) return 0
-  return (completedSteps.value / props.steps.length) * 100
-})
+  if (props.steps.length === 0) return 0;
+  return (completedSteps.value / props.steps.length) * 100;
+});
 
 const canStartWorkflow = computed(() => {
-  return props.workflowStatus === 'draft' && props.steps.length > 0
-})
+  return props.workflowStatus === 'draft' && props.steps.length > 0;
+});
 
 const canCancelWorkflow = computed(() => {
-  return ['in-progress', 'paused'].includes(props.workflowStatus) && props.allowCancel
-})
+  return ['in-progress', 'paused'].includes(props.workflowStatus) && props.allowCancel;
+});
 
 const canAddComment = computed(() => {
-  return props.allowComments && ['in-progress', 'paused'].includes(props.workflowStatus)
-})
+  return props.allowComments && ['in-progress', 'paused'].includes(props.workflowStatus);
+});
 
 /**
  * Workflow status helpers
  */
 function getWorkflowStatusColor(): string {
   switch (props.workflowStatus) {
-    case 'completed': return 'success'
-    case 'rejected': return 'error'
-    case 'cancelled': return 'warning'
-    case 'in-progress': return 'primary'
-    case 'paused': return 'warning'
-    default: return 'default'
+    case 'completed':
+      return 'success';
+    case 'rejected':
+      return 'error';
+    case 'cancelled':
+      return 'warning';
+    case 'in-progress':
+      return 'primary';
+    case 'paused':
+      return 'warning';
+    default:
+      return 'default';
   }
 }
 
 function getWorkflowStatusIcon(): string {
   switch (props.workflowStatus) {
-    case 'completed': return 'mdi-check-circle'
-    case 'rejected': return 'mdi-cancel'
-    case 'cancelled': return 'mdi-stop-circle'
-    case 'in-progress': return 'mdi-play-circle'
-    case 'paused': return 'mdi-pause-circle'
-    default: return 'mdi-clipboard-text'
+    case 'completed':
+      return 'mdi-check-circle';
+    case 'rejected':
+      return 'mdi-cancel';
+    case 'cancelled':
+      return 'mdi-stop-circle';
+    case 'in-progress':
+      return 'mdi-play-circle';
+    case 'paused':
+      return 'mdi-pause-circle';
+    default:
+      return 'mdi-clipboard-text';
   }
 }
 
 function getWorkflowStatusText(): string {
   switch (props.workflowStatus) {
-    case 'draft': return 'Draft'
-    case 'in-progress': return 'In Progress'
-    case 'completed': return 'Completed'
-    case 'rejected': return 'Rejected'
-    case 'cancelled': return 'Cancelled'
-    case 'paused': return 'Paused'
-    default: return 'Unknown'
+    case 'draft':
+      return 'Draft';
+    case 'in-progress':
+      return 'In Progress';
+    case 'completed':
+      return 'Completed';
+    case 'rejected':
+      return 'Rejected';
+    case 'cancelled':
+      return 'Cancelled';
+    case 'paused':
+      return 'Paused';
+    default:
+      return 'Unknown';
   }
 }
 
 function getProgressColor(): string {
-  if (props.workflowStatus === 'completed') return 'success'
-  if (props.workflowStatus === 'rejected') return 'error'
-  if (hasOverdueSteps()) return 'warning'
-  return 'primary'
+  if (props.workflowStatus === 'completed') return 'success';
+  if (props.workflowStatus === 'rejected') return 'error';
+  if (hasOverdueSteps()) return 'warning';
+  return 'primary';
 }
 
 /**
  * Step helpers
  */
 function isStepCompleted(index: number): boolean {
-  return props.steps[index]?.status === 'completed'
+  return props.steps[index]?.status === 'completed';
 }
 
 function isCurrentStep(index: number): boolean {
-  return index === currentStepIndex.value && props.workflowStatus === 'in-progress'
+  return index === currentStepIndex.value && props.workflowStatus === 'in-progress';
 }
 
 function getStepClasses(step: ApprovalStep, index: number): string[] {
-  const classes: string[] = []
-  
+  const classes: string[] = [];
+
   if (step.status) {
-    classes.push(`approval-workflow__step--${step.status}`)
+    classes.push(`approval-workflow__step--${step.status}`);
   }
-  
+
   if (isCurrentStep(index)) {
-    classes.push('approval-workflow__step--current')
+    classes.push('approval-workflow__step--current');
   }
-  
+
   if (step.dueDate && isOverdue(step.dueDate) && !isStepCompleted(index)) {
-    classes.push('approval-workflow__step--overdue')
+    classes.push('approval-workflow__step--overdue');
   }
-  
-  return classes
+
+  return classes;
 }
 
 function getStepColor(step: ApprovalStep, index: number): string {
-  if (step.status === 'completed') return 'success'
-  if (step.status === 'rejected') return 'error'
-  if (isCurrentStep(index)) return 'primary'
-  if (step.dueDate && isOverdue(step.dueDate)) return 'warning'
-  return 'default'
+  if (step.status === 'completed') return 'success';
+  if (step.status === 'rejected') return 'error';
+  if (isCurrentStep(index)) return 'primary';
+  if (step.dueDate && isOverdue(step.dueDate)) return 'warning';
+  return 'default';
 }
 
-function getStepVariant(step: ApprovalStep, index: number): 'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' {
-  if (step.status === 'completed' || isCurrentStep(index)) return 'flat'
-  return 'outlined'
+function getStepVariant(
+  step: ApprovalStep,
+  index: number
+): 'flat' | 'elevated' | 'tonal' | 'outlined' | 'text' | 'plain' {
+  if (step.status === 'completed' || isCurrentStep(index)) return 'flat';
+  return 'outlined';
 }
 
 function getStepIcon(step: ApprovalStep, index: number): string {
-  if (step.status === 'completed') return 'mdi-check'
-  if (step.status === 'rejected') return 'mdi-close'
-  if (isCurrentStep(index)) return 'mdi-play'
-  
+  if (step.status === 'completed') return 'mdi-check';
+  if (step.status === 'rejected') return 'mdi-close';
+  if (isCurrentStep(index)) return 'mdi-play';
+
   // Default icons based on step type
   switch (step.type) {
-    case 'review': return 'mdi-eye'
-    case 'approve': return 'mdi-check-circle-outline'
-    case 'sign': return 'mdi-signature'
-    case 'validate': return 'mdi-shield-check-outline'
-    default: return 'mdi-account-outline'
+    case 'review':
+      return 'mdi-eye';
+    case 'approve':
+      return 'mdi-check-circle-outline';
+    case 'sign':
+      return 'mdi-signature';
+    case 'validate':
+      return 'mdi-shield-check-outline';
+    default:
+      return 'mdi-account-outline';
   }
 }
 
 function getStepIconColor(step: ApprovalStep, index: number): string {
-  if (step.status === 'completed') return 'white'
-  if (step.status === 'rejected') return 'white'
-  if (isCurrentStep(index)) return 'white'
-  return 'default'
+  if (step.status === 'completed') return 'white';
+  if (step.status === 'rejected') return 'white';
+  if (isCurrentStep(index)) return 'white';
+  return 'default';
 }
 
 /**
  * Utility functions
  */
 function formatDate(date: Date | string): string {
-  const d = new Date(date)
+  const d = new Date(date);
   return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
-  })
+    year: 'numeric',
+  });
 }
 
 function formatDateTime(date: Date | string): string {
-  const d = new Date(date)
+  const d = new Date(date);
   return d.toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 }
 
 function isOverdue(dueDate: Date | string): boolean {
-  return new Date(dueDate) < new Date()
+  return new Date(dueDate) < new Date();
 }
 
 function hasOverdueSteps(): boolean {
-  return props.steps.some((step, index) => 
-    step.dueDate && 
-    isOverdue(step.dueDate) && 
-    !isStepCompleted(index)
-  )
+  return props.steps.some(
+    (step, index) => step.dueDate && isOverdue(step.dueDate) && !isStepCompleted(index)
+  );
 }
 
 function canUserAction(step: ApprovalStep, action: string): boolean {
   // This would typically check against user permissions
   // For now, return true as a placeholder
-  return true
+  return true;
 }
 
 /**
@@ -493,10 +516,10 @@ function handleApprove(step: ApprovalStep, index: number): void {
     step,
     stepIndex: index,
     comment: currentComment.value,
-    timestamp: new Date()
-  })
-  
-  currentComment.value = ''
+    timestamp: new Date(),
+  });
+
+  currentComment.value = '';
 }
 
 function handleReject(step: ApprovalStep, index: number): void {
@@ -504,10 +527,10 @@ function handleReject(step: ApprovalStep, index: number): void {
     step,
     stepIndex: index,
     comment: currentComment.value,
-    timestamp: new Date()
-  })
-  
-  currentComment.value = ''
+    timestamp: new Date(),
+  });
+
+  currentComment.value = '';
 }
 
 function handleDelegate(step: ApprovalStep, index: number): void {
@@ -515,31 +538,31 @@ function handleDelegate(step: ApprovalStep, index: number): void {
     step,
     stepIndex: index,
     comment: currentComment.value,
-    timestamp: new Date()
-  })
+    timestamp: new Date(),
+  });
 }
 
 function handleStartWorkflow(): void {
   emit('workflow-started', {
-    timestamp: new Date()
-  })
+    timestamp: new Date(),
+  });
 }
 
 function handleCancelWorkflow(): void {
   emit('workflow-cancelled', {
     reason: currentComment.value,
-    timestamp: new Date()
-  })
-  
-  currentComment.value = ''
+    timestamp: new Date(),
+  });
+
+  currentComment.value = '';
 }
 
 function handleExportApproval(): void {
   emit('export-approval', {
     steps: props.steps,
     workflowStatus: props.workflowStatus,
-    timestamp: new Date()
-  })
+    timestamp: new Date(),
+  });
 }
 </script>
 
@@ -764,17 +787,17 @@ function handleExportApproval(): void {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .approval-workflow__step {
     flex-direction: column;
   }
-  
+
   .approval-workflow__step-icon {
     margin-right: 0;
     margin-bottom: 16px;
     align-self: flex-start;
   }
-  
+
   .approval-workflow__step-connector {
     display: none;
   }
@@ -784,11 +807,11 @@ function handleExportApproval(): void {
   .approval-workflow {
     padding: 16px;
   }
-  
+
   .approval-workflow__default-actions {
     flex-direction: column;
   }
-  
+
   .approval-workflow__workflow-actions {
     flex-direction: column;
   }
@@ -812,7 +835,7 @@ function handleExportApproval(): void {
   .approval-workflow {
     border: 2px solid rgb(var(--v-theme-outline));
   }
-  
+
   .approval-workflow__step--current {
     border: 2px solid rgb(var(--v-theme-primary));
   }

@@ -59,7 +59,7 @@
                   >
                     Approve Transaction
                   </BankingButton>
-                  
+
                   <BankingButton
                     action-type="reject"
                     variant="reject"
@@ -68,20 +68,12 @@
                   >
                     Reject Transaction
                   </BankingButton>
-                  
-                  <BankingButton
-                    action-type="send-reminder"
-                    variant="outlined"
-                    icon="mdi-email"
-                  >
+
+                  <BankingButton action-type="send-reminder" variant="outlined" icon="mdi-email">
                     Send Reminder
                   </BankingButton>
-                  
-                  <BankingButton
-                    action-type="export"
-                    variant="outlined"
-                    icon="mdi-download"
-                  >
+
+                  <BankingButton action-type="export" variant="outlined" icon="mdi-download">
                     Export Data
                   </BankingButton>
                 </div>
@@ -93,10 +85,7 @@
                   <BankingButton>Normal</BankingButton>
                   <BankingButton :loading="true">Loading</BankingButton>
                   <BankingButton :disabled="true">Disabled</BankingButton>
-                  <BankingButton 
-                    :disabled="true" 
-                    disabled-reason="Insufficient permissions"
-                  >
+                  <BankingButton :disabled="true" disabled-reason="Insufficient permissions">
                     Disabled with Reason
                   </BankingButton>
                 </div>
@@ -177,11 +166,7 @@
                     />
                   </VCol>
                   <VCol cols="12" md="4">
-                    <BankingInput
-                      v-model="sampleData.filled"
-                      variant="filled"
-                      label="Filled"
-                    />
+                    <BankingInput v-model="sampleData.filled" variant="filled" label="Filled" />
                   </VCol>
                   <VCol cols="12" md="4">
                     <BankingInput
@@ -258,7 +243,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive } from 'vue';
 import {
   VContainer,
   VCard,
@@ -269,30 +254,30 @@ import {
   VWindow,
   VWindowItem,
   VRow,
-  VCol
-} from 'vuetify/components'
+  VCol,
+} from 'vuetify/components';
 
 // Import design system components
-import BankingButton from '../base/BankingButton.vue'
-import BankingInput from '../base/BankingInput.vue'
-import BankingTable from '../base/BankingTable.vue'
-import ApprovalWorkflow from '../banking/ApprovalWorkflow.vue'
-import AuditTrail from '../banking/AuditTrail.vue'
+import BankingButton from '../base/BankingButton.vue';
+import BankingInput from '../base/BankingInput.vue';
+import BankingTable from '../base/BankingTable.vue';
+import ApprovalWorkflow from '../banking/ApprovalWorkflow.vue';
+import AuditTrail from '../banking/AuditTrail.vue';
 
 // Import types
-import type { BankingTableHeader, BankingTableItem } from '../base/BankingTable.types'
-import type { ApprovalStep } from '../banking/ApprovalWorkflow.types'
-import type { AuditEntry, AuditFilters } from '../banking/AuditTrail.types'
+import type { BankingTableHeader, BankingTableItem } from '../base/BankingTable.types';
+import type { ApprovalStep } from '../banking/ApprovalWorkflow.types';
+import type { AuditEntry, AuditFilters } from '../banking/AuditTrail.types';
 
 /**
  * Design System Showcase Component
- * 
+ *
  * Interactive showcase of all banking design system components
  * with examples, documentation, and testing capabilities.
  */
 
 // Active tab state
-const activeTab = ref('buttons')
+const activeTab = ref('buttons');
 
 // Sample data for inputs
 const sampleData = reactive({
@@ -304,23 +289,23 @@ const sampleData = reactive({
   account: '',
   outlined: '',
   filled: '',
-  underlined: ''
-})
+  underlined: '',
+});
 
 // Validation rules
-const requiredRule = (value: any) => !!value || 'Field is required'
+const requiredRule = (value: any) => !!value || 'Field is required';
 const emailRule = (value: string) => {
-  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return !value || pattern.test(value) || 'Invalid email address'
-}
+  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return !value || pattern.test(value) || 'Invalid email address';
+};
 const currencyRule = (value: string) => {
-  const numValue = parseFloat(value.replace(/[^0-9.-]/g, ''))
-  return !value || !isNaN(numValue) || 'Invalid currency amount'
-}
+  const numValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
+  return !value || !isNaN(numValue) || 'Invalid currency amount';
+};
 const percentageRule = (value: string) => {
-  const numValue = parseFloat(value)
-  return !value || (!isNaN(numValue) && numValue >= 0 && numValue <= 100) || 'Invalid percentage'
-}
+  const numValue = parseFloat(value);
+  return !value || (!isNaN(numValue) && numValue >= 0 && numValue <= 100) || 'Invalid percentage';
+};
 
 // Table configuration
 const tableHeaders: BankingTableHeader[] = [
@@ -328,13 +313,13 @@ const tableHeaders: BankingTableHeader[] = [
     key: 'id',
     title: 'Transaction ID',
     type: 'text',
-    sortable: true
+    sortable: true,
   },
   {
     key: 'date',
     title: 'Date',
     type: 'date',
-    sortable: true
+    sortable: true,
   },
   {
     key: 'amount',
@@ -342,10 +327,10 @@ const tableHeaders: BankingTableHeader[] = [
     type: 'currency',
     format: {
       currency: {
-        code: 'USD'
-      }
+        code: 'USD',
+      },
     },
-    sortable: true
+    sortable: true,
   },
   {
     key: 'status',
@@ -354,50 +339,50 @@ const tableHeaders: BankingTableHeader[] = [
     format: {
       status: {
         colorMap: {
-          'completed': 'success',
-          'pending': 'warning',
-          'failed': 'error'
-        }
-      }
-    }
+          completed: 'success',
+          pending: 'warning',
+          failed: 'error',
+        },
+      },
+    },
   },
   {
     key: 'type',
     title: 'Type',
-    type: 'text'
-  }
-]
+    type: 'text',
+  },
+];
 
 const tableItems: BankingTableItem[] = [
   {
     id: 'TXN-001',
     date: '2024-01-15',
-    amount: 1250.00,
+    amount: 1250.0,
     status: 'completed',
-    type: 'Transfer'
+    type: 'Transfer',
   },
   {
     id: 'TXN-002',
     date: '2024-01-14',
-    amount: 850.50,
+    amount: 850.5,
     status: 'pending',
-    type: 'Payment'
+    type: 'Payment',
   },
   {
     id: 'TXN-003',
     date: '2024-01-13',
     amount: 2100.75,
     status: 'completed',
-    type: 'Deposit'
+    type: 'Deposit',
   },
   {
     id: 'TXN-004',
     date: '2024-01-12',
-    amount: 500.00,
+    amount: 500.0,
     status: 'failed',
-    type: 'Withdrawal'
-  }
-]
+    type: 'Withdrawal',
+  },
+];
 
 // Workflow steps
 const workflowSteps: ApprovalStep[] = [
@@ -417,9 +402,9 @@ const workflowSteps: ApprovalStep[] = [
         action: 'Approved',
         user: 'John Smith',
         timestamp: '2024-01-10T10:30:00Z',
-        comment: 'Application complete and meets initial criteria'
-      }
-    ]
+        comment: 'Application complete and meets initial criteria',
+      },
+    ],
   },
   {
     id: 'step-2',
@@ -432,7 +417,7 @@ const workflowSteps: ApprovalStep[] = [
     dueDate: '2024-01-16',
     allowApprove: true,
     allowReject: true,
-    allowDelegate: true
+    allowDelegate: true,
   },
   {
     id: 'step-3',
@@ -444,9 +429,9 @@ const workflowSteps: ApprovalStep[] = [
     assignee: 'Michael Davis',
     dueDate: '2024-01-18',
     allowApprove: true,
-    allowReject: true
-  }
-]
+    allowReject: true,
+  },
+];
 
 // Audit entries
 const auditEntries: AuditEntry[] = [
@@ -461,8 +446,8 @@ const auditEntries: AuditEntry[] = [
     metadata: {
       ipAddress: '192.168.1.100',
       location: 'New York, NY',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
   },
   {
     id: 'audit-002',
@@ -476,24 +461,24 @@ const auditEntries: AuditEntry[] = [
     details: {
       transactionId: 'TXN-12345',
       amount: 50000,
-      approver: 'sarah.johnson@bank.com'
+      approver: 'sarah.johnson@bank.com',
     },
     changes: [
       {
         field: 'status',
         oldValue: 'pending',
-        newValue: 'approved'
+        newValue: 'approved',
       },
       {
         field: 'approvedBy',
         oldValue: null,
-        newValue: 'sarah.johnson@bank.com'
-      }
+        newValue: 'sarah.johnson@bank.com',
+      },
     ],
     metadata: {
       ipAddress: '192.168.1.105',
-      location: 'Chicago, IL'
-    }
+      location: 'Chicago, IL',
+    },
   },
   {
     id: 'audit-003',
@@ -508,44 +493,44 @@ const auditEntries: AuditEntry[] = [
       {
         field: 'address',
         oldValue: '123 Old Street',
-        newValue: '456 New Avenue'
+        newValue: '456 New Avenue',
       },
       {
         field: 'phone',
         oldValue: '555-0123',
-        newValue: '555-0456'
-      }
+        newValue: '555-0456',
+      },
     ],
     metadata: {
       ipAddress: '192.168.1.10',
-      location: 'Head Office'
-    }
-  }
-]
+      location: 'Head Office',
+    },
+  },
+];
 
 // Event handlers
 function handleRowClick(item: BankingTableItem): void {
-  console.log('Row clicked:', item)
+  console.log('Row clicked:', item);
 }
 
 function handleExport(items: BankingTableItem[]): void {
-  console.log('Export requested:', items)
+  console.log('Export requested:', items);
 }
 
 function handleStepApproved(event: any): void {
-  console.log('Step approved:', event)
+  console.log('Step approved:', event);
 }
 
 function handleStepRejected(event: any): void {
-  console.log('Step rejected:', event)
+  console.log('Step rejected:', event);
 }
 
 function handleFiltersChanged(filters: AuditFilters): void {
-  console.log('Filters changed:', filters)
+  console.log('Filters changed:', filters);
 }
 
 function handleAuditExport(request: any): void {
-  console.log('Audit export requested:', request)
+  console.log('Audit export requested:', request);
 }
 </script>
 
