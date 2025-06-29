@@ -21,6 +21,7 @@ The DATA_ARCHITECTURE.md document has been comprehensively enhanced with detaile
 ## 🎯 Key Enhancements Made
 
 ### 1. **Visual Architecture Diagrams**
+
 - ✅ **Entity Relationship Diagram**: Complete Mermaid ERD showing all entities and relationships
 - ✅ **Data Flow Architecture**: Visual workflow from testing cycle creation to finding resolution
 - ✅ **Collection Architecture**: MongoDB collection structure and dependencies
@@ -30,6 +31,7 @@ The DATA_ARCHITECTURE.md document has been comprehensively enhanced with detaile
 ### 2. **Enhanced Entity Structures**
 
 #### Core Entities Extended
+
 - **Organization Entity**: Added regulatory profile, subscription management, feature flags
 - **User Entity**: Enhanced with MFA, session management, audit trails
 - **Control Entity**: Embedded regulatory mappings, testing procedures, change history
@@ -37,6 +39,7 @@ The DATA_ARCHITECTURE.md document has been comprehensively enhanced with detaile
 - **Evidence Management**: Detailed request/file separation with security controls
 
 #### New Supporting Entities
+
 - **Communication**: Structured audit communication trails
 - **Remediation Activities**: Finding remediation tracking
 - **Audit Logs**: Comprehensive activity logging
@@ -45,6 +48,7 @@ The DATA_ARCHITECTURE.md document has been comprehensively enhanced with detaile
 ### 3. **Performance and Scalability Strategy**
 
 #### Database Optimization
+
 ```javascript
 // Example: Critical performance indexes
 db.control_assignments.createIndex({ 
@@ -55,11 +59,13 @@ db.control_assignments.createIndex({
 ```
 
 #### Sharding Strategy
+
 - **Organization-based sharding**: Natural tenant isolation
 - **Time-series sharding**: Efficient historical data management
 - **Geographic zones**: Regulatory compliance and data residency
 
 #### Caching Architecture
+
 - **Redis cluster**: Session data and frequently accessed information
 - **Application-level caching**: Control definitions and user permissions
 - **Query result caching**: Complex aggregation results
@@ -67,12 +73,14 @@ db.control_assignments.createIndex({
 ### 4. **Security and Compliance Framework**
 
 #### Multi-Layer Security
+
 - **Field-level encryption**: Sensitive data protection
 - **Transport security**: TLS 1.3 for all communications
 - **Access controls**: RBAC with attribute-based extensions
 - **Audit logging**: Comprehensive activity tracking
 
 #### Regulatory Compliance
+
 - **SOX Compliance**: 7-year retention, change tracking, integrity validation
 - **GDPR Compliance**: Data subject rights, consent management
 - **PCI DSS**: Payment data protection, access logging
@@ -81,6 +89,7 @@ db.control_assignments.createIndex({
 ### 5. **Data Lifecycle Management**
 
 #### Automated Retention
+
 ```mermaid
 flowchart TD
     A[Data Creation] --> B[Active Use]
@@ -89,6 +98,7 @@ flowchart TD
 ```
 
 #### Compliance-Driven Policies
+
 - **Audit Evidence**: 7-year total retention (3 active + 4 archive)
 - **User Activity**: 7-year retention with automated archival
 - **Communications**: 5-year retention with cycle-based triggers
@@ -96,12 +106,14 @@ flowchart TD
 ### 6. **API Design Framework**
 
 #### GraphQL Schema
+
 - **Type-safe queries**: Strong typing for all entities
 - **Relationship traversal**: Efficient navigation between related data
 - **Real-time subscriptions**: Live updates for progress tracking
 - **Filtered aggregations**: Complex reporting queries
 
 #### Query Optimization
+
 - **DataLoader patterns**: N+1 query prevention
 - **Field-level permissions**: Security at the schema level
 - **Pagination strategies**: Efficient large dataset handling
@@ -109,6 +121,7 @@ flowchart TD
 ## 📊 Technical Specifications
 
 ### Database Architecture
+
 | Component | Technology | Purpose | Scaling Strategy |
 |-----------|------------|---------|------------------|
 | **Primary Database** | MongoDB 6.0+ | Document storage | Horizontal sharding |
@@ -118,6 +131,7 @@ flowchart TD
 | **Message Queue** | Redis/RabbitMQ | Async processing | Cluster distribution |
 
 ### Performance Targets
+
 | Metric | Target | Measurement |
 |--------|--------|-------------|
 | **Query Response** | <100ms (95th percentile) | Database monitoring |
@@ -127,6 +141,7 @@ flowchart TD
 | **Concurrent Users** | 1,000+ simultaneous | Load testing validation |
 
 ### Security Specifications
+
 | Layer | Implementation | Standard |
 |-------|----------------|----------|
 | **Transport** | TLS 1.3 | NIST guidelines |
@@ -138,6 +153,7 @@ flowchart TD
 ## 🏦 Banking Industry Alignment
 
 ### Regulatory Requirements
+
 - **SOX Section 404**: Internal control assessment and documentation
 - **FFIEC Guidelines**: IT risk management and audit requirements  
 - **Basel III**: Operational risk data aggregation
@@ -145,6 +161,7 @@ flowchart TD
 - **PCI DSS**: Payment card industry data security
 
 ### Industry Best Practices
+
 - **Control Framework Integration**: COSO, COBIT alignment
 - **Audit Standards**: PCAOB, IIA methodology support
 - **Risk Management**: Quantitative risk assessment capabilities
@@ -153,24 +170,28 @@ flowchart TD
 ## 🚀 Implementation Roadmap
 
 ### Phase 1: Foundation (Months 1-2)
+
 - MongoDB cluster setup and configuration
 - Core collection creation with validation
 - Basic indexing and performance optimization
 - Security framework implementation
 
 ### Phase 2: Core Features (Months 3-4)
+
 - File storage integration (MinIO/S3)
 - Caching layer deployment (Redis)
 - Search functionality (Elasticsearch)
 - Real-time notification system
 
 ### Phase 3: Advanced Features (Months 5-6)
+
 - Sharding implementation for scalability
 - Advanced security features (field-level encryption)
 - Compliance reporting automation
 - Performance monitoring and alerting
 
 ### Phase 4: Production Readiness (Months 7-8)
+
 - Load testing and optimization
 - Disaster recovery procedures
 - Monitoring and observability
@@ -179,18 +200,21 @@ flowchart TD
 ## 📈 Business Impact
 
 ### Operational Benefits
+
 - **50% Faster Queries**: Optimized indexing and caching strategies
 - **99.9% Uptime**: High availability architecture with failover
 - **Real-time Insights**: Live progress tracking and notifications
 - **Automated Compliance**: Built-in regulatory requirement satisfaction
 
 ### Technical Benefits
+
 - **Horizontal Scalability**: Support for 10,000+ users across multiple organizations
 - **Data Integrity**: Comprehensive audit trails and change tracking
 - **Security Compliance**: Banking-grade security implementation
 - **Developer Productivity**: Well-structured APIs and clear data models
 
 ### Risk Mitigation
+
 - **Data Loss Prevention**: Multiple backup strategies and replication
 - **Security Breach Protection**: Multi-layer security with encryption
 - **Compliance Violations**: Automated compliance checking and reporting
@@ -199,12 +223,14 @@ flowchart TD
 ## 📋 Quality Assurance
 
 ### Code Quality
+
 - **Schema Validation**: MongoDB schema validation for data integrity
 - **API Documentation**: GraphQL introspection and documentation
 - **Performance Testing**: Automated load testing for all operations
 - **Security Testing**: Regular penetration testing and vulnerability scans
 
 ### Documentation Quality
+
 - **Visual Diagrams**: Mermaid diagrams for architecture visualization
 - **Code Examples**: Practical implementation examples for all patterns
 - **Migration Scripts**: Database migration and setup procedures
@@ -213,6 +239,7 @@ flowchart TD
 ## 🔗 Integration Points
 
 ### External Systems
+
 - **Active Directory**: User authentication and authorization
 - **Email Systems**: Notification delivery and communication
 - **Banking Core Systems**: Future integration capabilities
@@ -220,6 +247,7 @@ flowchart TD
 - **Monitoring Tools**: Application and infrastructure monitoring
 
 ### Development Tools
+
 - **Database Tools**: MongoDB Compass, Studio 3T integration
 - **API Tools**: GraphQL Playground, Postman collections
 - **Monitoring**: Prometheus, Grafana dashboard configurations
