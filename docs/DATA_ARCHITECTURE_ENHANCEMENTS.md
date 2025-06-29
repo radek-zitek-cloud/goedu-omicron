@@ -4,6 +4,20 @@
 
 The DATA_ARCHITECTURE.md document has been comprehensively enhanced with detailed entity designs, visual diagrams, performance strategies, and implementation guidance specifically tailored for banking IT control testing workflows.
 
+---
+
+## 📚 Table of Contents
+
+1. [Key Enhancements Made](#-key-enhancements-made)
+2. [Technical Specifications](#-technical-specifications)
+3. [Banking Industry Alignment](#-banking-industry-alignment)
+4. [Implementation Roadmap](#-implementation-roadmap)
+5. [Business Impact](#-business-impact)
+6. [Quality Assurance](#-quality-assurance)
+7. [Integration Points](#-integration-points)
+
+---
+
 ## 🎯 Key Enhancements Made
 
 ### 1. **Visual Architecture Diagrams**
