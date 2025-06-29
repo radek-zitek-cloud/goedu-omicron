@@ -30,10 +30,10 @@
                   {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
                 </v-chip>
               </div>
-              
+
               <div v-if="authStore.user" class="mb-4">
-                <strong>User:</strong> {{ authStore.userFullName }}<br>
-                <strong>Role:</strong> {{ authStore.user.role }}<br>
+                <strong>User:</strong> {{ authStore.userFullName }}<br />
+                <strong>Role:</strong> {{ authStore.user.role }}<br />
                 <strong>Organization:</strong> {{ authStore.user.organizationName }}
               </div>
 
@@ -57,13 +57,8 @@
               >
                 Simulate Login
               </v-btn>
-              
-              <v-btn
-                v-else
-                @click="logout"
-                :loading="authStore.isLoading"
-                color="error"
-              >
+
+              <v-btn v-else @click="logout" :loading="authStore.isLoading" color="error">
                 Logout
               </v-btn>
             </v-card-text>
@@ -78,10 +73,11 @@
               <div class="mb-4">
                 <strong>Organizations Count:</strong> {{ organizationsStore.organizationCount }}
               </div>
-              
+
               <div v-if="organizationsStore.currentOrganization" class="mb-4">
-                <strong>Current Org:</strong> {{ organizationsStore.currentOrganizationName }}<br>
-                <strong>Industry:</strong> {{ organizationsStore.currentOrganization.industry }}<br>
+                <strong>Current Org:</strong> {{ organizationsStore.currentOrganizationName }}<br />
+                <strong>Industry:</strong> {{ organizationsStore.currentOrganization.industry
+                }}<br />
                 <strong>Members:</strong> {{ organizationsStore.currentOrganizationMembers.length }}
               </div>
 
@@ -92,7 +88,11 @@
                   size="small"
                   class="ml-2"
                 >
-                  {{ organizationsStore.hasCurrentOrganization ? 'Organization Selected' : 'No Organization' }}
+                  {{
+                    organizationsStore.hasCurrentOrganization
+                      ? 'Organization Selected'
+                      : 'No Organization'
+                  }}
                 </v-chip>
               </div>
 
@@ -105,7 +105,7 @@
               >
                 Load Organizations
               </v-btn>
-              
+
               <v-btn
                 @click="simulateCreateOrg"
                 :loading="organizationsStore.isLoading"
@@ -142,7 +142,7 @@
               </div>
 
               <div class="mb-4">
-                <strong>Upcoming Tests:</strong> {{ controlsStore.upcomingTests.length }}<br>
+                <strong>Upcoming Tests:</strong> {{ controlsStore.upcomingTests.length }}<br />
                 <strong>Overdue Tests:</strong> {{ controlsStore.overdueTests.length }}
               </div>
 
@@ -155,11 +155,7 @@
                 >
                   None
                 </v-chip>
-                <v-chip
-                  v-else
-                  size="small"
-                  color="info"
-                >
+                <v-chip v-else size="small" color="info">
                   {{ Object.keys(controlsStore.filters).length }} filters
                 </v-chip>
               </div>
@@ -173,7 +169,7 @@
               >
                 Load Controls
               </v-btn>
-              
+
               <v-btn
                 @click="simulateCreateControl"
                 :loading="controlsStore.isLoading"
@@ -184,13 +180,7 @@
                 Simulate Create Control
               </v-btn>
 
-              <v-btn
-                @click="toggleFilters"
-                color="info"
-                block
-              >
-                Toggle Filters
-              </v-btn>
+              <v-btn @click="toggleFilters" color="info" block> Toggle Filters </v-btn>
             </v-card-text>
           </v-card>
         </v-col>
@@ -213,12 +203,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import { 
-  useAuthStore, 
-  useOrganizationsStore, 
-  useControlsStore, 
-  storeUtils 
-} from '@/stores';
+import { useAuthStore, useOrganizationsStore, useControlsStore, storeUtils } from '@/stores';
 
 // Initialize stores
 const authStore = useAuthStore();
@@ -232,7 +217,7 @@ const storeHealth = computed(() => storeUtils.getStoreHealth());
 const simulateLogin = async () => {
   // In a real app, this would call authStore.login() with actual credentials
   console.log('This would normally call authStore.login() with credentials');
-  
+
   // For demo purposes, we'll show what the login process would look like
   alert('In a real app, this would authenticate with the backend API');
 };
@@ -266,7 +251,7 @@ const loadControls = async () => {
     alert('Please select an organization first');
     return;
   }
-  
+
   const success = await controlsStore.loadControls(organizationsStore.currentOrganizationId);
   if (success) {
     console.log('Controls loaded successfully');
@@ -288,7 +273,7 @@ const toggleFilters = () => {
       status: ['active'],
       category: ['financial', 'operational'],
       riskLevel: ['high'],
-      search: 'demo'
+      search: 'demo',
     });
     console.log('Demo filters applied');
   } else {
@@ -302,7 +287,7 @@ const toggleFilters = () => {
 onMounted(async () => {
   // Initialize auth store
   await authStore.initialize();
-  
+
   console.log('Store demo component initialized');
   console.log('Store health:', storeHealth.value);
 });
