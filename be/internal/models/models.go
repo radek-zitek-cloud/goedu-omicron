@@ -24,31 +24,52 @@ type BaseModel struct {
 
 // Organization represents a client organization using the platform.
 // Organizations provide multi-tenancy and data isolation for different clients.
+// This implementation follows the enhanced structure defined in DATA_ARCHITECTURE.md
 type Organization struct {
 	BaseModel `bson:",inline"`
 	
-	// Basic organization information
+	// Basic organization information - core identity fields
 	Name        string `bson:"name" json:"name" validate:"required,min=1,max=255"`
+	DisplayName string `bson:"display_name,omitempty" json:"display_name,omitempty"`
 	Slug        string `bson:"slug" json:"slug" validate:"required,min=1,max=100"`
 	Description string `bson:"description,omitempty" json:"description,omitempty"`
 	
-	// Contact information
-	ContactEmail string `bson:"contact_email" json:"contact_email" validate:"required,email"`
-	ContactPhone string `bson:"contact_phone,omitempty" json:"contact_phone,omitempty"`
+	// Organization classification and context
+	Type     string `bson:"type" json:"type"` // commercial_bank, credit_union, investment_bank, insurance
+	Industry string `bson:"industry" json:"industry"` // financial_services, banking, insurance
+	Size     string `bson:"size,omitempty" json:"size,omitempty"` // small, medium, large, enterprise
+	Region   string `bson:"region,omitempty" json:"region,omitempty"`
+	Country  string `bson:"country,omitempty" json:"country,omitempty"`
+	Timezone string `bson:"timezone,omitempty" json:"timezone,omitempty"`
+	Currency string `bson:"currency,omitempty" json:"currency,omitempty"`
 	
-	// Address information
-	Address Address `bson:"address,omitempty" json:"address,omitempty"`
+	// Contact and location information
+	ContactEmail string  `bson:"contact_email" json:"contact_email" validate:"required,email"`
+	ContactPhone string  `bson:"contact_phone,omitempty" json:"contact_phone,omitempty"`
+	Website      string  `bson:"website,omitempty" json:"website,omitempty"`
+	LogoURL      string  `bson:"logo_url,omitempty" json:"logo_url,omitempty"`
+	Address      Address `bson:"address,omitempty" json:"address,omitempty"`
 	
-	// Regulatory profile for compliance requirements
+	// Regulatory profile for compliance requirements - enhanced structure
 	RegulatoryProfile RegulatoryProfile `bson:"regulatory_profile" json:"regulatory_profile"`
 	
-	// Subscription and feature flags
-	SubscriptionTier string            `bson:"subscription_tier" json:"subscription_tier"`
-	FeatureFlags     map[string]bool   `bson:"feature_flags,omitempty" json:"feature_flags,omitempty"`
+	// Subscription management - comprehensive subscription handling
+	Subscription OrganizationSubscription `bson:"subscription" json:"subscription"`
 	
-	// Status and metadata
-	Status   string                 `bson:"status" json:"status"`
-	Settings map[string]interface{} `bson:"settings,omitempty" json:"settings,omitempty"`
+	// Feature flags per organization - granular feature control
+	FeatureFlags map[string]bool `bson:"feature_flags,omitempty" json:"feature_flags,omitempty"`
+	
+	// Organization settings and configuration
+	Settings OrganizationSettings `bson:"settings" json:"settings"`
+	
+	// Status and lifecycle management
+	Status      string `bson:"status" json:"status"` // active, inactive, suspended, trial
+	IsActive    bool   `bson:"is_active" json:"is_active"`
+	MemberCount int    `bson:"member_count" json:"member_count"`
+	MaxMembers  int    `bson:"max_members" json:"max_members"`
+	
+	// Metadata for additional organization information
+	Metadata map[string]interface{} `bson:"metadata,omitempty" json:"metadata,omitempty"`
 }
 
 // Address represents a physical address for organizations.
@@ -61,21 +82,44 @@ type Address struct {
 	Country    string `bson:"country,omitempty" json:"country,omitempty"`
 }
 
-// RegulatoryProfile defines compliance requirements for an organization.
+// RegulatoryProfile defines comprehensive compliance requirements for an organization.
+// This structure follows the regulatory profile specification from DATA_ARCHITECTURE.md
 type RegulatoryProfile struct {
-	Industry    string   `bson:"industry" json:"industry"`
-	Regulations []string `bson:"regulations" json:"regulations"`
+	// Primary regulatory classification
+	Industry          string `bson:"industry" json:"industry"` // financial_services, banking, insurance, etc.
+	PrimaryRegulator  string `bson:"primary_regulator" json:"primary_regulator"` // OCC, Federal Reserve, FDIC, State
 	
-	// Compliance requirements
-	RequiredFrameworks []string `bson:"required_frameworks" json:"required_frameworks"`
-	AuditFrequency     string   `bson:"audit_frequency" json:"audit_frequency"`
-	RetentionPeriod    int      `bson:"retention_period" json:"retention_period"` // in years
+	// Applicable compliance frameworks and regulations
+	ApplicableFrameworks []string `bson:"applicable_frameworks" json:"applicable_frameworks"` // SOX, PCI-DSS, Basel III, FFIEC, etc.
+	Regulations         []string `bson:"regulations" json:"regulations"` // Additional specific regulations
 	
-	// Risk profile
-	RiskTolerance string `bson:"risk_tolerance" json:"risk_tolerance"`
+	// Examination and audit cycle information
+	ExamCycle      string    `bson:"exam_cycle" json:"exam_cycle"` // 18_months, 12_months, 24_months
+	LastExamDate   time.Time `bson:"last_exam_date,omitempty" json:"last_exam_date,omitempty"`
+	NextExamDate   time.Time `bson:"next_exam_date,omitempty" json:"next_exam_date,omitempty"`
+	AuditFrequency string    `bson:"audit_frequency" json:"audit_frequency"` // quarterly, annually, etc.
 	
-	// Certification requirements
-	Certifications []Certification `bson:"certifications,omitempty" json:"certifications,omitempty"`
+	// Data retention and compliance requirements
+	RetentionPeriod int `bson:"retention_period" json:"retention_period"` // in years (typically 7 for SOX compliance)
+	
+	// Risk management profile
+	RiskTolerance  string `bson:"risk_tolerance" json:"risk_tolerance"` // low, medium, high
+	RiskFramework  string `bson:"risk_framework,omitempty" json:"risk_framework,omitempty"` // COSO, ISO 31000, etc.
+	
+	// Certification and compliance status
+	Certifications    []Certification `bson:"certifications,omitempty" json:"certifications,omitempty"`
+	ComplianceStatus  string          `bson:"compliance_status" json:"compliance_status"` // compliant, pending, non_compliant
+	LastReviewDate    time.Time       `bson:"last_review_date,omitempty" json:"last_review_date,omitempty"`
+	NextReviewDate    time.Time       `bson:"next_review_date,omitempty" json:"next_review_date,omitempty"`
+	
+	// Additional regulatory requirements
+	RequiresSOX       bool `bson:"requires_sox" json:"requires_sox"`
+	RequiresPCIDSS    bool `bson:"requires_pci_dss" json:"requires_pci_dss"`
+	RequiresFFIEC     bool `bson:"requires_ffiec" json:"requires_ffiec"`
+	RequiresBaselIII  bool `bson:"requires_basel_iii" json:"requires_basel_iii"`
+	
+	// Custom regulatory metadata
+	CustomRequirements map[string]interface{} `bson:"custom_requirements,omitempty" json:"custom_requirements,omitempty"`
 }
 
 // Certification represents regulatory certifications held by the organization.
@@ -86,6 +130,130 @@ type Certification struct {
 	IssuedDate time.Time `bson:"issued_date" json:"issued_date"`
 	ExpiryDate time.Time `bson:"expiry_date" json:"expiry_date"`
 	Status     string    `bson:"status" json:"status"`
+}
+
+// OrganizationSubscription manages subscription details and billing information.
+// This provides comprehensive subscription management for multi-tenant SaaS model.
+type OrganizationSubscription struct {
+	// Subscription tier and plan information
+	Plan   string `bson:"plan" json:"plan"` // starter, professional, enterprise
+	Tier   string `bson:"tier" json:"tier"` // legacy field, use Plan instead
+	Status string `bson:"status" json:"status"` // active, suspended, trial, expired, cancelled
+	
+	// Billing and payment information
+	BillingPeriod    string    `bson:"billing_period" json:"billing_period"` // monthly, yearly
+	BillingEmail     string    `bson:"billing_email,omitempty" json:"billing_email,omitempty"`
+	CurrentPeriodStart time.Time `bson:"current_period_start,omitempty" json:"current_period_start,omitempty"`
+	CurrentPeriodEnd   time.Time `bson:"current_period_end,omitempty" json:"current_period_end,omitempty"`
+	
+	// Trial information
+	TrialStart  time.Time `bson:"trial_start,omitempty" json:"trial_start,omitempty"`
+	TrialEnd    time.Time `bson:"trial_end,omitempty" json:"trial_end,omitempty"`
+	IsInTrial   bool      `bson:"is_in_trial" json:"is_in_trial"`
+	
+	// Usage and limits
+	UserLimit      int `bson:"user_limit" json:"user_limit"`
+	StorageLimit   int64 `bson:"storage_limit" json:"storage_limit"` // in bytes
+	CurrentUsers   int `bson:"current_users" json:"current_users"`
+	CurrentStorage int64 `bson:"current_storage" json:"current_storage"` // in bytes
+	
+	// Payment tracking
+	LastPaymentDate time.Time `bson:"last_payment_date,omitempty" json:"last_payment_date,omitempty"`
+	NextPaymentDate time.Time `bson:"next_payment_date,omitempty" json:"next_payment_date,omitempty"`
+	PaymentMethod   string    `bson:"payment_method,omitempty" json:"payment_method,omitempty"`
+	
+	// Subscription metadata
+	SubscriptionID     string    `bson:"subscription_id,omitempty" json:"subscription_id,omitempty"` // External billing system ID
+	CustomerID         string    `bson:"customer_id,omitempty" json:"customer_id,omitempty"` // External billing customer ID
+	CreatedAt          time.Time `bson:"created_at" json:"created_at"`
+	UpdatedAt          time.Time `bson:"updated_at" json:"updated_at"`
+}
+
+// OrganizationSettings contains organization-specific configuration and preferences.
+// This provides granular control over organization behavior and features.
+type OrganizationSettings struct {
+	// Security and access control settings
+	RequireMFA            bool `bson:"require_mfa" json:"require_mfa"`
+	AllowInvitations      bool `bson:"allow_invitations" json:"allow_invitations"`
+	SessionTimeoutMinutes int  `bson:"session_timeout_minutes" json:"session_timeout_minutes"`
+	
+	// Data and audit settings
+	EnableAuditLog       bool `bson:"enable_audit_log" json:"enable_audit_log"`
+	DataRetentionDays    int  `bson:"data_retention_days" json:"data_retention_days"`
+	AllowDataExport      bool `bson:"allow_data_export" json:"allow_data_export"`
+	
+	// User interface and branding settings
+	CustomBranding       bool   `bson:"custom_branding" json:"custom_branding"`
+	Theme                string `bson:"theme,omitempty" json:"theme,omitempty"`
+	PrimaryColor         string `bson:"primary_color,omitempty" json:"primary_color,omitempty"`
+	SecondaryColor       string `bson:"secondary_color,omitempty" json:"secondary_color,omitempty"`
+	
+	// Integration and API settings
+	Integrations OrganizationIntegrations `bson:"integrations" json:"integrations"`
+	
+	// Notification and communication settings
+	Notifications OrganizationNotifications `bson:"notifications" json:"notifications"`
+	
+	// Compliance and regulatory settings
+	ComplianceSettings OrganizationCompliance `bson:"compliance_settings" json:"compliance_settings"`
+	
+	// Default user permissions and roles
+	DefaultUserRole        string   `bson:"default_user_role,omitempty" json:"default_user_role,omitempty"`
+	DefaultUserPermissions []string `bson:"default_user_permissions,omitempty" json:"default_user_permissions,omitempty"`
+	
+	// Workflow and automation settings
+	AutoAssignControls     bool `bson:"auto_assign_controls" json:"auto_assign_controls"`
+	AutoGenerateWorkpapers bool `bson:"auto_generate_workpapers" json:"auto_generate_workpapers"`
+	EnableWorkflowReminders bool `bson:"enable_workflow_reminders" json:"enable_workflow_reminders"`
+	
+	// Custom settings for organization-specific needs
+	CustomSettings map[string]interface{} `bson:"custom_settings,omitempty" json:"custom_settings,omitempty"`
+}
+
+// OrganizationIntegrations manages external system integration settings.
+type OrganizationIntegrations struct {
+	SSO  bool `bson:"sso" json:"sso"`
+	LDAP bool `bson:"ldap" json:"ldap"`
+	API  bool `bson:"api" json:"api"`
+	
+	// Specific integration configurations
+	SSOProvider    string `bson:"sso_provider,omitempty" json:"sso_provider,omitempty"`
+	LDAPServer     string `bson:"ldap_server,omitempty" json:"ldap_server,omitempty"`
+	APIKeyEnabled  bool   `bson:"api_key_enabled" json:"api_key_enabled"`
+	WebhooksEnabled bool  `bson:"webhooks_enabled" json:"webhooks_enabled"`
+}
+
+// OrganizationNotifications manages notification preferences and settings.
+type OrganizationNotifications struct {
+	EmailEnabled     bool   `bson:"email_enabled" json:"email_enabled"`
+	SMSEnabled       bool   `bson:"sms_enabled" json:"sms_enabled"`
+	WebEnabled       bool   `bson:"web_enabled" json:"web_enabled"`
+	
+	// Notification frequency and timing
+	DigestFrequency  string `bson:"digest_frequency,omitempty" json:"digest_frequency,omitempty"` // daily, weekly, monthly
+	QuietHoursStart  string `bson:"quiet_hours_start,omitempty" json:"quiet_hours_start,omitempty"`
+	QuietHoursEnd    string `bson:"quiet_hours_end,omitempty" json:"quiet_hours_end,omitempty"`
+	
+	// Specific notification types
+	EvidenceRequests bool `bson:"evidence_requests" json:"evidence_requests"`
+	DeadlineReminders bool `bson:"deadline_reminders" json:"deadline_reminders"`
+	SystemAlerts     bool `bson:"system_alerts" json:"system_alerts"`
+}
+
+// OrganizationCompliance manages compliance-specific settings and automation.
+type OrganizationCompliance struct {
+	AutoGenerateReports    bool     `bson:"auto_generate_reports" json:"auto_generate_reports"`
+	RequireDigitalSignature bool    `bson:"require_digital_signature" json:"require_digital_signature"`
+	EnableChangeTracking   bool     `bson:"enable_change_tracking" json:"enable_change_tracking"`
+	
+	// Document and evidence requirements
+	RequireEvidenceApproval bool `bson:"require_evidence_approval" json:"require_evidence_approval"`
+	MinimumReviewers       int  `bson:"minimum_reviewers" json:"minimum_reviewers"`
+	
+	// Compliance reporting settings
+	ReportingFrequency     string   `bson:"reporting_frequency,omitempty" json:"reporting_frequency,omitempty"`
+	ReportRecipients       []string `bson:"report_recipients,omitempty" json:"report_recipients,omitempty"`
+	AutoSubmitReports      bool     `bson:"auto_submit_reports" json:"auto_submit_reports"`
 }
 
 // User represents a user in the system with role-based access control.
@@ -294,7 +462,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Department:     u.Profile.Department,
 		OrganizationID: u.OrganizationID,
 		Role:           strings.Join(u.Roles, ","), // Primary role for backwards compatibility
-		Permissions:    u.getPermissionsList(),
+		Permissions:    u.GetPermissionsList(),
 		Status:         u.Status,
 		LastLogin:      u.Authentication.LastLoginAt,
 		MFAEnabled:     u.Authentication.MFAEnabled,
@@ -303,8 +471,8 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 	}
 }
 
-// getPermissionsList converts the user's permissions to a string slice for API compatibility.
-func (u *User) getPermissionsList() []string {
+// GetPermissionsList converts the user's permissions to a string slice for API compatibility.
+func (u *User) GetPermissionsList() []string {
 	var permissions []string
 	
 	// Add permissions based on the UserPermissions structure
@@ -586,6 +754,19 @@ const (
 	OrganizationStatusActive    = "active"
 	OrganizationStatusInactive  = "inactive"
 	OrganizationStatusSuspended = "suspended"
+	OrganizationStatusTrial     = "trial"
+	
+	// Subscription statuses
+	SubscriptionStatusActive    = "active"
+	SubscriptionStatusSuspended = "suspended" 
+	SubscriptionStatusTrial     = "trial"
+	SubscriptionStatusExpired   = "expired"
+	SubscriptionStatusCancelled = "cancelled"
+	
+	// Subscription plans
+	SubscriptionPlanStarter      = "starter"
+	SubscriptionPlanProfessional = "professional"
+	SubscriptionPlanEnterprise   = "enterprise"
 	
 	// Control statuses
 	ControlStatusDraft    = "draft"
