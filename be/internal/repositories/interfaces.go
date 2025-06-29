@@ -5,6 +5,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/radek-zitek-cloud/goedu-omicron/be/internal/models"
 )
@@ -322,5 +323,3 @@ type CacheRepository interface {
 	GetStats(ctx context.Context) (map[string]interface{}, error)
 }
 
-// Additional imports for time
-import "time"

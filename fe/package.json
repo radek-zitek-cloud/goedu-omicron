@@ -14,7 +14,17 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "vue": "^3.5.17"
+    "@apollo/client": "^3.11.11",
+    "@mdi/font": "^7.4.47",
+    "@vue/apollo-composable": "^4.2.1",
+    "@vueuse/core": "^12.0.0",
+    "axios": "^1.7.9",
+    "graphql": "^16.9.0",
+    "material-design-icons-iconfont": "^6.7.0",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.7.9"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
@@ -28,8 +38,9 @@
     "jiti": "^2.4.2",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.6.2",
+    "sass-embedded": "^1.89.2",
     "typescript": "~5.8.0",
-    "vite": "npm:rolldown-vite@latest",
+    "vite": "^6.3.5",
     "vite-plugin-vue-devtools": "^7.7.7",
     "vue-tsc": "^2.2.10"
   }
