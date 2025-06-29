@@ -1,31 +1,31 @@
 /**
  * Vue Router Configuration for GoEdu Omicron Banking Platform
- * 
+ *
  * Defines all application routes with proper authentication guards,
  * lazy loading, and metadata for the banking control testing system.
- * 
+ *
  * Route Structure:
  * - Public routes: Login, registration, documentation
  * - Protected routes: Dashboard, controls, testing, reports
  * - Admin routes: User management, system configuration
- * 
+ *
  * Security Features:
  * - Authentication guards for protected routes
  * - Role-based access control (RBAC)
  * - Route meta for breadcrumbs and permissions
  * - Lazy loading for code splitting
- * 
+ *
  * @author GoEdu Development Team
  * @version 1.0.0
  * @since 2024
  */
 
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 // import { useAuthStore } from '@/stores/auth' // Temporarily disabled for initial setup
 
 /**
  * Route Definitions
- * 
+ *
  * All routes are lazy-loaded for optimal performance.
  * Each route includes metadata for permissions and UI configuration.
  */
@@ -39,8 +39,8 @@ const routes: RouteRecordRaw[] = [
       title: 'GoEdu Omicron - Banking Control Testing Platform',
       description: 'Professional banking compliance and control testing platform',
       public: true,
-      showInNavigation: false
-    }
+      showInNavigation: false,
+    },
   },
 
   // Placeholder routes for future development
@@ -53,8 +53,8 @@ const routes: RouteRecordRaw[] = [
       description: 'Secure login to banking control testing platform',
       public: true,
       hideNavigation: true,
-      showInNavigation: false
-    }
+      showInNavigation: false,
+    },
   },
   {
     path: '/register',
@@ -65,8 +65,8 @@ const routes: RouteRecordRaw[] = [
       description: 'Create new account for banking control testing',
       public: true,
       hideNavigation: true,
-      showInNavigation: false
-    }
+      showInNavigation: false,
+    },
   },
   {
     path: '/dashboard',
@@ -80,8 +80,8 @@ const routes: RouteRecordRaw[] = [
       breadcrumb: 'Dashboard',
       icon: 'mdi-view-dashboard',
       showInNavigation: true,
-      order: 1
-    }
+      order: 1,
+    },
   },
 
   // Error Routes
@@ -93,20 +93,20 @@ const routes: RouteRecordRaw[] = [
       title: 'Page Not Found - GoEdu Omicron',
       public: true,
       hideNavigation: true,
-      showInNavigation: false
-    }
+      showInNavigation: false,
+    },
   },
 
   // Catch-all route - must be last
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/404'
-  }
-]
+    redirect: '/404',
+  },
+];
 
 /**
  * Router Instance Configuration
- * 
+ *
  * Creates router with history mode and scroll behavior.
  * Includes proper base URL handling for deployment flexibility.
  */
@@ -116,28 +116,28 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     // Return to saved position if available (back/forward buttons)
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     }
-    
+
     // Scroll to anchor if present
     if (to.hash) {
       return {
         el: to.hash,
-        behavior: 'smooth'
-      }
+        behavior: 'smooth',
+      };
     }
-    
+
     // Scroll to top for new pages
-    return { top: 0, behavior: 'smooth' }
-  }
-})
+    return { top: 0, behavior: 'smooth' };
+  },
+});
 
 /**
  * Authentication Guard
- * 
+ *
  * Protects routes based on authentication status and user roles.
  * Redirects to appropriate pages based on access level.
- * 
+ *
  * @param to - Target route
  * @param from - Source route
  * @param next - Navigation callback
@@ -145,13 +145,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   try {
     // Update document title
-    document.title = to.meta.title as string || 'GoEdu Omicron'
-    
+    document.title = (to.meta.title as string) || 'GoEdu Omicron';
+
     // Temporarily allow all navigation for initial setup
     // TODO: Implement full authentication guard
-    console.log('🔄 Navigation to:', to.name)
-    next()
-    
+    console.log('🔄 Navigation to:', to.name);
+    next();
+
     /* 
     // Full implementation will be restored once auth store is properly configured
     
@@ -199,38 +199,38 @@ router.beforeEach(async (to, from, next) => {
     next()
     */
   } catch (error) {
-    console.error('❌ Router guard error:', error)
-    next()
+    console.error('❌ Router guard error:', error);
+    next();
   }
-})
+});
 
 /**
  * Navigation Progress Tracking
- * 
+ *
  * Provides loading indicators and error handling for route changes.
  */
 router.beforeResolve((to, from, next) => {
   // Show loading indicator for slow route changes
   if (to.meta.requiresAuth && to.name !== from.name) {
     // Could integrate with loading store here
-    console.log('🔄 Loading route:', to.name)
+    console.log('🔄 Loading route:', to.name);
   }
-  next()
-})
+  next();
+});
 
 router.afterEach((to, from, failure) => {
   if (failure) {
-    console.error('❌ Route navigation failed:', failure)
+    console.error('❌ Route navigation failed:', failure);
   } else {
-    console.log('✅ Route navigation completed:', to.name)
+    console.log('✅ Route navigation completed:', to.name);
   }
-})
+});
 
-export default router
+export default router;
 
 /*
  * Navigation Helper Functions
- * 
+ *
  * Utility functions for common navigation patterns.
  * These will be restored once the full type definitions are in place.
  */
@@ -242,7 +242,7 @@ export const navigationHelpers = {
    */
   getNavigationItems(userRole: string) {
     // Temporarily simplified for initial setup
-    return []
+    return [];
     /*
     return routes
       .filter(route => 
@@ -267,7 +267,7 @@ export const navigationHelpers = {
    */
   getBreadcrumbs(route: any) {
     // Temporarily simplified for initial setup
-    return []
+    return [];
     /*
     const breadcrumbs = []
     let current = route
@@ -285,5 +285,5 @@ export const navigationHelpers = {
     
     return breadcrumbs
     */
-  }
-}
+  },
+};
