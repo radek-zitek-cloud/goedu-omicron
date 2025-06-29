@@ -83,16 +83,20 @@ func main() {
 //   - error: Initialization error if any step fails
 //
 // Example:
-//   app, err := NewApplication(context.Background())
-//   if err != nil {
-//       log.Fatal("Application initialization failed:", err)
-//   }
+//
+//	app, err := NewApplication(context.Background())
+//	if err != nil {
+//	    log.Fatal("Application initialization failed:", err)
+//	}
 func NewApplication(ctx context.Context) (*Application, error) {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration: %w", err)
 	}
+
+	// Log configuration summary in development
+	cfg.LogConfigSummary()
 
 	// Initialize logger
 	log, err := logger.New(&cfg.Logger)
