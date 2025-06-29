@@ -4,6 +4,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/radek-zitek-cloud/goedu-omicron/be/internal/models"
 )
@@ -87,6 +88,91 @@ type EvidenceService interface {
 	
 	// GetPendingRequests retrieves pending evidence requests for a user
 	GetPendingRequests(ctx context.Context, userID string) ([]*models.EvidenceRequest, error)
+}
+
+// AuthenticationService handles user authentication, authorization, and security operations.
+// It provides comprehensive authentication features including JWT token management,
+// password hashing, session management, and role-based access control.
+type AuthenticationService interface {
+	// Authentication operations
+	Login(ctx context.Context, request *models.LoginRequest) (*models.LoginResponse, error)
+	Logout(ctx context.Context, sessionID string) error
+	RefreshToken(ctx context.Context, refreshToken string) (*models.LoginResponse, error)
+	
+	// Password management
+	ChangePassword(ctx context.Context, userID, oldPassword, newPassword string) error
+	ResetPassword(ctx context.Context, email string) error
+	ValidatePasswordReset(ctx context.Context, token, newPassword string) error
+	
+	// Multi-factor authentication
+	EnableMFA(ctx context.Context, userID string) (*MFASetupResponse, error)
+	DisableMFA(ctx context.Context, userID, mfaCode string) error
+	ValidateMFA(ctx context.Context, userID, mfaCode string) error
+	GenerateBackupCodes(ctx context.Context, userID string) ([]string, error)
+	
+	// Session management
+	CreateSession(ctx context.Context, userID, ipAddress, userAgent string) (*models.Session, error)
+	GetSession(ctx context.Context, sessionID string) (*models.Session, error)
+	UpdateSessionActivity(ctx context.Context, sessionID string) error
+	TerminateSession(ctx context.Context, sessionID string) error
+	TerminateAllSessions(ctx context.Context, userID string) error
+	
+	// Token operations
+	ValidateAccessToken(ctx context.Context, token string) (*models.JWTClaims, error)
+	GenerateAccessToken(ctx context.Context, user *models.User, sessionID, ipAddress string) (string, time.Time, error)
+	GenerateRefreshToken(ctx context.Context, userID, sessionID string) (string, time.Time, error)
+	
+	// Account security
+	LockAccount(ctx context.Context, userID string, reason string) error
+	UnlockAccount(ctx context.Context, userID string) error
+	RecordFailedLogin(ctx context.Context, userID, ipAddress string) error
+	RecordSuccessfulLogin(ctx context.Context, userID, ipAddress string) error
+	
+	// Security questions
+	SetSecurityQuestions(ctx context.Context, userID string, questions []models.SecurityQuestion) error
+	ValidateSecurityAnswer(ctx context.Context, userID, question, answer string) error
+	
+	// Audit and compliance
+	LogSecurityEvent(ctx context.Context, event *models.AuditEvent) error
+	GetSecurityEvents(ctx context.Context, userID string, timeRange *TimeRange) ([]*models.AuditEvent, error)
+}
+
+// PermissionService handles role-based access control and permission management.
+// It provides comprehensive RBAC functionality with hierarchical permissions.
+type PermissionService interface {
+	// Permission checking
+	HasPermission(ctx context.Context, userID, resource, action, scope string) (bool, error)
+	ValidatePermission(ctx context.Context, userID, resource, action, scope string) error
+	GetUserPermissions(ctx context.Context, userID string) ([]string, error)
+	
+	// Role management
+	CreateRole(ctx context.Context, role *models.Role) error
+	GetRole(ctx context.Context, roleID string) (*models.Role, error)
+	UpdateRole(ctx context.Context, roleID string, updates *UpdateRoleInput) error
+	DeleteRole(ctx context.Context, roleID string) error
+	ListRoles(ctx context.Context, organizationID string) ([]*models.Role, error)
+	
+	// User role assignment
+	AssignRole(ctx context.Context, userID, roleID string) error
+	RevokeRole(ctx context.Context, userID, roleID string) error
+	GetUserRoles(ctx context.Context, userID string) ([]*models.Role, error)
+	
+	// Permission management
+	CreatePermission(ctx context.Context, permission *models.Permission) error
+	GetPermission(ctx context.Context, permissionID string) (*models.Permission, error)
+	UpdatePermission(ctx context.Context, permissionID string, updates *UpdatePermissionInput) error
+	DeletePermission(ctx context.Context, permissionID string) error
+	ListPermissions(ctx context.Context, filter *PermissionFilter) ([]*models.Permission, error)
+	
+	// Role-permission association
+	GrantPermissionToRole(ctx context.Context, roleID, permissionID string) error
+	RevokePermissionFromRole(ctx context.Context, roleID, permissionID string) error
+	GetRolePermissions(ctx context.Context, roleID string) ([]*models.Permission, error)
+	
+	// Bulk operations
+	BulkAssignPermissions(ctx context.Context, roleID string, permissionIDs []string) error
+	BulkRevokePermissions(ctx context.Context, roleID string, permissionIDs []string) error
+	SyncUserPermissions(ctx context.Context, userID string) error
 }
 
 // UserService manages user accounts, authentication, and authorization.
@@ -418,4 +504,42 @@ type NotificationPreferences struct {
 	EvidenceRequest bool `json:"evidence_request"`
 	Reminders       bool `json:"reminders"`
 	SystemAlerts    bool `json:"system_alerts"`
+}
+
+// Authentication service input/output structures
+
+// MFASetupResponse contains MFA setup information
+type MFASetupResponse struct {
+	Secret      string   `json:"secret"`
+	QRCodeURL   string   `json:"qr_code_url"`
+	BackupCodes []string `json:"backup_codes"`
+}
+
+// UpdateRoleInput contains data for updating roles
+type UpdateRoleInput struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsActive    *bool   `json:"is_active,omitempty"`
+	Priority    *int    `json:"priority,omitempty"`
+}
+
+// UpdatePermissionInput contains data for updating permissions
+type UpdatePermissionInput struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsActive    *bool   `json:"is_active,omitempty"`
+	Category    *string `json:"category,omitempty"`
+}
+
+// PermissionFilter defines filtering options for permission queries
+type PermissionFilter struct {
+	Resource     string `json:"resource,omitempty"`
+	Action       string `json:"action,omitempty"`
+	Scope        string `json:"scope,omitempty"`
+	Category     string `json:"category,omitempty"`
+	IsActive     *bool  `json:"is_active,omitempty"`
+	
+	// Pagination
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
 }

@@ -4,6 +4,8 @@
 package models
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,37 +89,314 @@ type Certification struct {
 }
 
 // User represents a user in the system with role-based access control.
+// Enhanced to match DATA_ARCHITECTURE.md specification with comprehensive security context.
 type User struct {
 	BaseModel `bson:",inline"`
 	
-	// Personal information
-	FirstName string `bson:"first_name" json:"first_name" validate:"required,min=1,max=100"`
-	LastName  string `bson:"last_name" json:"last_name" validate:"required,min=1,max=100"`
-	Email     string `bson:"email" json:"email" validate:"required,email"`
+	// Basic identification - matches email field from DATA_ARCHITECTURE.md
+	Email string `bson:"email" json:"email" validate:"required,email"`
 	
-	// Authentication
-	PasswordHash string    `bson:"password_hash" json:"-"`
-	LastLogin    time.Time `bson:"last_login,omitempty" json:"last_login,omitempty"`
+	// Profile information - structured to match DATA_ARCHITECTURE.md profile section
+	Profile UserProfile `bson:"profile" json:"profile"`
 	
-	// Organization and role
+	// Authentication details - enhanced security structure from DATA_ARCHITECTURE.md
+	Authentication AuthenticationDetails `bson:"authentication" json:"authentication"`
+	
+	// Authorization - role-based access control
+	Roles       []string `bson:"roles" json:"roles" validate:"required,min=1"`
+	Permissions UserPermissions `bson:"permissions" json:"permissions"`
+	
+	// Organization context
 	OrganizationID primitive.ObjectID `bson:"organization_id" json:"organization_id" validate:"required"`
-	Role           string             `bson:"role" json:"role" validate:"required"`
-	Permissions    []string           `bson:"permissions,omitempty" json:"permissions,omitempty"`
 	
-	// Profile information
-	Title      string `bson:"title,omitempty" json:"title,omitempty"`
-	Department string `bson:"department,omitempty" json:"department,omitempty"`
-	Phone      string `bson:"phone,omitempty" json:"phone,omitempty"`
+	// Status and lifecycle
+	IsActive bool   `bson:"is_active" json:"is_active"`
+	Status   string `bson:"status" json:"status"` // active, inactive, suspended, locked
 	
-	// Status and preferences
-	Status      string                 `bson:"status" json:"status"`
-	Preferences map[string]interface{} `bson:"preferences,omitempty" json:"preferences,omitempty"`
+	// Metadata and preferences - matches DATA_ARCHITECTURE.md metadata section
+	Metadata UserMetadata `bson:"metadata" json:"metadata"`
+}
+
+// UserProfile contains the user's personal and professional information.
+// This structure matches the profile section in DATA_ARCHITECTURE.md
+type UserProfile struct {
+	FirstName   string `bson:"first_name" json:"first_name" validate:"required,min=1,max=100"`
+	LastName    string `bson:"last_name" json:"last_name" validate:"required,min=1,max=100"`
+	Title       string `bson:"title,omitempty" json:"title,omitempty"`
+	Department  string `bson:"department,omitempty" json:"department,omitempty"`
+	PhoneNumber string `bson:"phone_number,omitempty" json:"phone_number,omitempty"`
+}
+
+// GetFullName returns the user's full name for display purposes.
+func (up *UserProfile) GetFullName() string {
+	return fmt.Sprintf("%s %s", up.FirstName, up.LastName)
+}
+
+// GetInitials returns the user's initials for avatar display.
+func (up *UserProfile) GetInitials() string {
+	if len(up.FirstName) == 0 || len(up.LastName) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%c%c", up.FirstName[0], up.LastName[0])
+}
+
+// AuthenticationDetails contains comprehensive authentication and security information.
+// Enhanced structure based on DATA_ARCHITECTURE.md authentication section
+type AuthenticationDetails struct {
+	// Password management
+	PasswordHash         string    `bson:"password_hash" json:"-"`
+	LastPasswordChange   time.Time `bson:"last_password_change,omitempty" json:"last_password_change,omitempty"`
+	PasswordExpiresAt    time.Time `bson:"password_expires_at,omitempty" json:"password_expires_at,omitempty"`
+	RequirePasswordReset bool      `bson:"require_password_reset" json:"require_password_reset"`
 	
-	// Security settings
-	MFAEnabled    bool      `bson:"mfa_enabled" json:"mfa_enabled"`
-	MFASecret     string    `bson:"mfa_secret,omitempty" json:"-"`
-	FailedLogins  int       `bson:"failed_logins" json:"failed_logins"`
-	LockedUntil   time.Time `bson:"locked_until,omitempty" json:"locked_until,omitempty"`
+	// Session tracking
+	LastLoginAt     time.Time `bson:"last_login_at,omitempty" json:"last_login_at,omitempty"`
+	LastLoginIP     string    `bson:"last_login_ip,omitempty" json:"last_login_ip,omitempty"`
+	CurrentSessionCount int   `bson:"current_session_count" json:"current_session_count"`
+	
+	// Multi-factor authentication
+	MFAEnabled    bool   `bson:"mfa_enabled" json:"mfa_enabled"`
+	MFASecret     string `bson:"mfa_secret,omitempty" json:"-"` // Encrypted TOTP secret
+	MFABackupCodes []string `bson:"mfa_backup_codes,omitempty" json:"-"` // Encrypted backup codes
+	MFAMethod     string `bson:"mfa_method,omitempty" json:"mfa_method,omitempty"` // totp, sms, email
+	
+	// Account security
+	FailedLoginAttempts int       `bson:"failed_login_attempts" json:"failed_login_attempts"`
+	LockoutUntil        time.Time `bson:"lockout_until,omitempty" json:"lockout_until,omitempty"`
+	AccountLockedAt     time.Time `bson:"account_locked_at,omitempty" json:"account_locked_at,omitempty"`
+	SecurityQuestions   []SecurityQuestion `bson:"security_questions,omitempty" json:"-"`
+	
+	// Compliance and audit
+	LastSecurityReview  time.Time `bson:"last_security_review,omitempty" json:"last_security_review,omitempty"`
+	ComplianceFlags     []string  `bson:"compliance_flags,omitempty" json:"compliance_flags,omitempty"`
+}
+
+// SecurityQuestion represents a user security question for account recovery.
+type SecurityQuestion struct {
+	Question     string `bson:"question" json:"question"`
+	AnswerHash   string `bson:"answer_hash" json:"-"`
+	CreatedAt    time.Time `bson:"created_at" json:"created_at"`
+}
+
+// UserPermissions represents granular permissions for the user.
+// This structure supports the detailed permission model from DATA_ARCHITECTURE.md
+type UserPermissions struct {
+	// Control management permissions
+	CanViewControls    bool `bson:"can_view_controls" json:"can_view_controls"`
+	CanEditControls    bool `bson:"can_edit_controls" json:"can_edit_controls"`
+	CanDeleteControls  bool `bson:"can_delete_controls" json:"can_delete_controls"`
+	CanCreateControls  bool `bson:"can_create_controls" json:"can_create_controls"`
+	
+	// Testing and assignment permissions
+	CanAssignTests     bool `bson:"can_assign_tests" json:"can_assign_tests"`
+	CanExecuteTests    bool `bson:"can_execute_tests" json:"can_execute_tests"`
+	CanReviewTests     bool `bson:"can_review_tests" json:"can_review_tests"`
+	
+	// Evidence and findings permissions
+	CanViewEvidence    bool `bson:"can_view_evidence" json:"can_view_evidence"`
+	CanUploadEvidence  bool `bson:"can_upload_evidence" json:"can_upload_evidence"`
+	CanApproveFindings bool `bson:"can_approve_findings" json:"can_approve_findings"`
+	
+	// Reporting and analytics permissions
+	CanViewReports     bool `bson:"can_view_reports" json:"can_view_reports"`
+	CanCreateReports   bool `bson:"can_create_reports" json:"can_create_reports"`
+	CanExportData      bool `bson:"can_export_data" json:"can_export_data"`
+	
+	// User and organization management
+	CanManageUsers     bool `bson:"can_manage_users" json:"can_manage_users"`
+	CanManageSettings  bool `bson:"can_manage_settings" json:"can_manage_settings"`
+	CanViewAuditLogs   bool `bson:"can_view_audit_logs" json:"can_view_audit_logs"`
+	
+	// Custom permissions for specific organizational needs
+	CustomPermissions  map[string]bool `bson:"custom_permissions,omitempty" json:"custom_permissions,omitempty"`
+}
+
+// UserMetadata contains additional user information and preferences.
+// Enhanced structure based on DATA_ARCHITECTURE.md metadata section
+type UserMetadata struct {
+	// System preferences
+	Timezone    string `bson:"timezone" json:"timezone"`
+	Language    string `bson:"language,omitempty" json:"language,omitempty"`
+	DateFormat  string `bson:"date_format,omitempty" json:"date_format,omitempty"`
+	
+	// Application preferences
+	Preferences UserPreferences `bson:"preferences" json:"preferences"`
+	
+	// Professional information
+	EmployeeID      string    `bson:"employee_id,omitempty" json:"employee_id,omitempty"`
+	HireDate        time.Time `bson:"hire_date,omitempty" json:"hire_date,omitempty"`
+	ManagerID       primitive.ObjectID `bson:"manager_id,omitempty" json:"manager_id,omitempty"`
+	CostCenter      string    `bson:"cost_center,omitempty" json:"cost_center,omitempty"`
+	
+	// Certification and training
+	Certifications  []UserCertification `bson:"certifications,omitempty" json:"certifications,omitempty"`
+	TrainingRecords []TrainingRecord    `bson:"training_records,omitempty" json:"training_records,omitempty"`
+	
+	// Contact and emergency information
+	EmergencyContact EmergencyContact `bson:"emergency_contact,omitempty" json:"emergency_contact,omitempty"`
+	WorkLocation     string           `bson:"work_location,omitempty" json:"work_location,omitempty"`
+}
+
+// UserPreferences contains user interface and notification preferences.
+type UserPreferences struct {
+	// Notification preferences
+	EmailNotifications    bool `bson:"email_notifications" json:"email_notifications"`
+	SMSNotifications      bool `bson:"sms_notifications" json:"sms_notifications"`
+	BrowserNotifications  bool `bson:"browser_notifications" json:"browser_notifications"`
+	
+	// Interface preferences
+	DashboardLayout       string `bson:"dashboard_layout" json:"dashboard_layout"` // compact, detailed, custom
+	Theme                 string `bson:"theme,omitempty" json:"theme,omitempty"`   // light, dark, auto
+	
+	// Workflow preferences
+	DefaultAssignmentView string `bson:"default_assignment_view,omitempty" json:"default_assignment_view,omitempty"`
+	AutoSaveDrafts        bool   `bson:"auto_save_drafts" json:"auto_save_drafts"`
+	ShowAdvancedFeatures  bool   `bson:"show_advanced_features" json:"show_advanced_features"`
+}
+
+// UserCertification represents professional certifications held by the user.
+type UserCertification struct {
+	Name           string    `bson:"name" json:"name"`
+	IssuingBody    string    `bson:"issuing_body" json:"issuing_body"`
+	CertificationID string   `bson:"certification_id,omitempty" json:"certification_id,omitempty"`
+	IssuedDate     time.Time `bson:"issued_date" json:"issued_date"`
+	ExpiryDate     time.Time `bson:"expiry_date,omitempty" json:"expiry_date,omitempty"`
+	Status         string    `bson:"status" json:"status"` // active, expired, suspended
+}
+
+// TrainingRecord represents training completed by the user.
+type TrainingRecord struct {
+	Title          string    `bson:"title" json:"title"`
+	Provider       string    `bson:"provider" json:"provider"`
+	CompletedDate  time.Time `bson:"completed_date" json:"completed_date"`
+	ExpiryDate     time.Time `bson:"expiry_date,omitempty" json:"expiry_date,omitempty"`
+	CertificateURL string    `bson:"certificate_url,omitempty" json:"certificate_url,omitempty"`
+	Credits        float64   `bson:"credits,omitempty" json:"credits,omitempty"`
+}
+
+// EmergencyContact represents emergency contact information for the user.
+type EmergencyContact struct {
+	Name         string `bson:"name" json:"name"`
+	Relationship string `bson:"relationship" json:"relationship"`
+	PhoneNumber  string `bson:"phone_number" json:"phone_number"`
+	Email        string `bson:"email,omitempty" json:"email,omitempty"`
+}
+
+// ToUserProfileResponse converts a User to a UserProfileResponse for API responses.
+// This provides a safe, sanitized version of user data for client consumption.
+func (u *User) ToUserProfileResponse() *UserProfileResponse {
+	return &UserProfileResponse{
+		ID:             u.ID,
+		Email:          u.Email,
+		FirstName:      u.Profile.FirstName,
+		LastName:       u.Profile.LastName,
+		Title:          u.Profile.Title,
+		Department:     u.Profile.Department,
+		OrganizationID: u.OrganizationID,
+		Role:           strings.Join(u.Roles, ","), // Primary role for backwards compatibility
+		Permissions:    u.getPermissionsList(),
+		Status:         u.Status,
+		LastLogin:      u.Authentication.LastLoginAt,
+		MFAEnabled:     u.Authentication.MFAEnabled,
+		CreatedAt:      u.CreatedAt,
+		UpdatedAt:      u.UpdatedAt,
+	}
+}
+
+// getPermissionsList converts the user's permissions to a string slice for API compatibility.
+func (u *User) getPermissionsList() []string {
+	var permissions []string
+	
+	// Add permissions based on the UserPermissions structure
+	if u.Permissions.CanViewControls {
+		permissions = append(permissions, "controls:read")
+	}
+	if u.Permissions.CanEditControls {
+		permissions = append(permissions, "controls:write")
+	}
+	if u.Permissions.CanAssignTests {
+		permissions = append(permissions, "assignments:create")
+	}
+	if u.Permissions.CanApproveFindings {
+		permissions = append(permissions, "findings:approve")
+	}
+	if u.Permissions.CanViewReports {
+		permissions = append(permissions, "reports:read")
+	}
+	if u.Permissions.CanManageUsers {
+		permissions = append(permissions, "users:manage")
+	}
+	
+	// Add custom permissions
+	for permission, granted := range u.Permissions.CustomPermissions {
+		if granted {
+			permissions = append(permissions, permission)
+		}
+	}
+	
+	return permissions
+}
+
+// IsLocked checks if the user account is currently locked.
+func (u *User) IsLocked() bool {
+	return !u.Authentication.LockoutUntil.IsZero() && u.Authentication.LockoutUntil.After(time.Now())
+}
+
+// IsPasswordExpired checks if the user's password has expired.
+func (u *User) IsPasswordExpired() bool {
+	if u.Authentication.PasswordExpiresAt.IsZero() {
+		return false
+	}
+	return u.Authentication.PasswordExpiresAt.Before(time.Now())
+}
+
+// RequiresMFA checks if the user requires multi-factor authentication.
+func (u *User) RequiresMFA() bool {
+	return u.Authentication.MFAEnabled
+}
+
+// CanPerformAction checks if the user has permission to perform a specific action.
+// This is a helper method for common permission checks.
+func (u *User) CanPerformAction(action string) bool {
+	switch action {
+	case "view_controls":
+		return u.Permissions.CanViewControls
+	case "edit_controls":
+		return u.Permissions.CanEditControls
+	case "assign_tests":
+		return u.Permissions.CanAssignTests
+	case "approve_findings":
+		return u.Permissions.CanApproveFindings
+	case "manage_users":
+		return u.Permissions.CanManageUsers
+	case "view_reports":
+		return u.Permissions.CanViewReports
+	default:
+		// Check custom permissions
+		if granted, exists := u.Permissions.CustomPermissions[action]; exists {
+			return granted
+		}
+		return false
+	}
+}
+
+// UserProfileResponse represents the user information included in authentication responses.
+// This is a sanitized version of the User model safe for client consumption.
+type UserProfileResponse struct {
+	ID             primitive.ObjectID `json:"id"`
+	Email          string             `json:"email"`
+	FirstName      string             `json:"first_name"`
+	LastName       string             `json:"last_name"`
+	Title          string             `json:"title,omitempty"`
+	Department     string             `json:"department,omitempty"`
+	OrganizationID primitive.ObjectID `json:"organization_id"`
+	Role           string             `json:"role"`
+	Permissions    []string           `json:"permissions,omitempty"`
+	Status         string             `json:"status"`
+	LastLogin      time.Time          `json:"last_login,omitempty"`
+	MFAEnabled     bool               `json:"mfa_enabled"`
+	CreatedAt      time.Time          `json:"created_at"`
+	UpdatedAt      time.Time          `json:"updated_at"`
 }
 
 // Control represents a compliance control that needs to be tested.
