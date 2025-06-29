@@ -19,6 +19,7 @@ The application uses Pinia for centralized state management with the following k
 Manages user authentication, sessions, and security-related state.
 
 #### Key Features:
+
 - JWT token management with refresh capability
 - Role-based access control (RBAC)
 - Session timeout handling
@@ -26,6 +27,7 @@ Manages user authentication, sessions, and security-related state.
 - Secure logout with token invalidation
 
 #### Usage Example:
+
 ```typescript
 <script setup lang="ts">
 import { useAuthStore } from '@/stores';
@@ -39,7 +41,7 @@ const login = async () => {
     password: 'password123',
     rememberMe: true
   });
-  
+
   if (success) {
     console.log('Login successful');
     console.log('User:', authStore.user);
@@ -56,6 +58,7 @@ const logout = () => authStore.logout();
 ```
 
 #### Persisted State:
+
 - User information
 - Last activity timestamp
 
@@ -64,6 +67,7 @@ const logout = () => authStore.logout();
 Manages organization data, member management, and organization-specific settings.
 
 #### Key Features:
+
 - Organization CRUD operations
 - Current organization selection
 - Member management with role-based access
@@ -71,6 +75,7 @@ Manages organization data, member management, and organization-specific settings
 - Multi-tenant data isolation
 
 #### Usage Example:
+
 ```typescript
 <script setup lang="ts">
 import { useOrganizationsStore } from '@/stores';
@@ -112,7 +117,7 @@ const createOrg = async () => {
     },
     subscriptionPlan: 'professional'
   });
-  
+
   if (newOrg) {
     console.log('Organization created:', newOrg);
   }
@@ -126,7 +131,7 @@ const inviteMember = async () => {
     permissions: ['VIEW_CONTROLS', 'EDIT_CONTROLS'],
     message: 'Welcome to our organization!'
   });
-  
+
   if (success) {
     console.log('Member invited successfully');
   }
@@ -135,6 +140,7 @@ const inviteMember = async () => {
 ```
 
 #### Persisted State:
+
 - Current organization
 - Organizations list
 - Last sync timestamp
@@ -144,6 +150,7 @@ const inviteMember = async () => {
 Manages banking controls, test executions, and compliance tracking.
 
 #### Key Features:
+
 - Control CRUD operations with full lifecycle management
 - Test execution and result tracking
 - Evidence management and file attachments
@@ -152,6 +159,7 @@ Manages banking controls, test executions, and compliance tracking.
 - Offline queue for sync when online
 
 #### Usage Example:
+
 ```typescript
 <script setup lang="ts">
 import { useControlsStore } from '@/stores';
@@ -199,7 +207,7 @@ const createControl = async () => {
     relatedControls: [],
     effectiveDate: new Date()
   });
-  
+
   if (newControl) {
     console.log('Control created:', newControl);
   }
@@ -220,7 +228,7 @@ const executeTest = async (controlId: string) => {
     reviewerId: 'reviewer456',
     notes: 'Regular monthly test execution'
   });
-  
+
   if (test) {
     console.log('Test execution started:', test);
   }
@@ -234,7 +242,7 @@ const filterControls = () => {
     riskLevel: ['high', 'critical'],
     search: 'cash'
   });
-  
+
   console.log('Filtered controls:', controlsStore.filteredControls);
 };
 
@@ -245,6 +253,7 @@ const overdueTests = controlsStore.overdueTests;
 ```
 
 #### Persisted State:
+
 - Controls list
 - Current filters
 - Last sync timestamp
@@ -260,13 +269,13 @@ import { initializeStores } from '@/stores';
 
 async function initializeApp() {
   const app = createApp(App);
-  
+
   // Register Pinia
   app.use(pinia);
-  
+
   // Initialize stores and HTTP interceptors
   initializeStores();
-  
+
   app.mount('#app');
 }
 ```
@@ -306,6 +315,7 @@ All stores are fully typed with TypeScript:
 ## Best Practices
 
 ### 1. Store Usage in Components
+
 ```typescript
 // ✅ Good: Use stores in setup function
 <script setup lang="ts">
@@ -320,6 +330,7 @@ const authStore = useAuthStore(); // This will cause issues
 ```
 
 ### 2. Error Handling
+
 ```typescript
 // ✅ Good: Handle errors properly
 const login = async () => {
@@ -336,6 +347,7 @@ const login = async () => {
 ```
 
 ### 3. Reactive State
+
 ```typescript
 // ✅ Good: Use computed for reactive derived state
 const userFullName = computed(() => authStore.userFullName);
@@ -345,6 +357,7 @@ const userFullName = authStore.userFullName;
 ```
 
 ### 4. Store Cleanup
+
 ```typescript
 // ✅ Good: Cleanup on logout or organization change
 const logout = async () => {
