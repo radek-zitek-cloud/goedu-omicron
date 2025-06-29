@@ -25,7 +25,7 @@ app:
       - "X-Correlation-ID"
 
 database:
-  uri: "mongodb+srv://radek:qWbxTa7viXNe3pB6@clusterzitekcloud.dznruy0.mongodb.net/?retryWrites=true&w=majority&appName=ClusterZitekCloud"
+  uri: "mongodb://localhost:27017"
   database: "goedu"
   max_pool_size: 100
   min_pool_size: 10
@@ -34,9 +34,9 @@ database:
   server_select_timeout: "10s"
 
 cache:
-  host: "redis-19496.c85.us-east-1-2.ec2.redns.redis-cloud.com"
-  port: 19496
-  password: "c6p5Av8V6EEwSwlVCFN6aBKpTizgxhwd"
+  host: "localhost"
+  port: 6379
+  password: ""
   database: 0
   max_retries: 3
   pool_size: 10

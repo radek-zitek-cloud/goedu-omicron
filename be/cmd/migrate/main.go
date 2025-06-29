@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/radek-zitek-cloud/goedu-omicron/be/internal/config"
+	"github.com/radek-zitek-cloud/goedu-omicron/be/internal/migrations"
 	"github.com/radek-zitek-cloud/goedu-omicron/be/pkg/database"
 	"github.com/radek-zitek-cloud/goedu-omicron/be/pkg/logger"
 )
@@ -54,8 +55,8 @@ func main() {
 	log.Info("Database migration completed successfully")
 }
 
-// runMigrations executes all database migrations.
-// This includes creating indexes, collections, and any schema updates.
+// runMigrations executes all database migrations using the enhanced migration system.
+// This includes creating indexes, collections, schema updates, and version tracking.
 //
 // Parameters:
 //   - ctx: Context for migration operations
@@ -65,20 +66,56 @@ func main() {
 // Returns:
 //   - error: Migration error if any step fails
 func runMigrations(ctx context.Context, db *database.Client, log *logger.Logger) error {
-	log.Info("Creating database indexes...")
+	log.Info("Initializing migration manager...")
 	
-	// Create indexes (this is already implemented in the database client)
-	if err := db.CreateIndexes(ctx); err != nil {
-		return fmt.Errorf("failed to create indexes: %w", err)
+	// Create migration manager
+	migrationManager := migrations.NewMigrationManager(db, log)
+	
+	// Get current database version
+	currentVersion, err := migrationManager.GetVersion(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get current database version: %w", err)
+	}
+	
+	log.Info("Current database version",
+		logger.Int("version", currentVersion),
+	)
+	
+	// Apply all pending migrations
+	if err := migrationManager.Up(ctx); err != nil {
+		return fmt.Errorf("failed to apply migrations: %w", err)
+	}
+	
+	// Get updated version
+	newVersion, err := migrationManager.GetVersion(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get updated database version: %w", err)
+	}
+	
+	log.Info("Database migration completed",
+		logger.Int("previous_version", currentVersion),
+		logger.Int("current_version", newVersion),
+	)
+	
+	// Display migration history
+	history, err := migrationManager.GetMigrationHistory(ctx)
+	if err != nil {
+		log.Error(ctx, "Failed to get migration history", err)
+		// Don't fail the migration for this
+	} else {
+		log.Info("Migration history retrieved",
+			logger.Int("total_migrations", len(history)),
+		)
+		
+		for _, record := range history {
+			log.Info("Applied migration",
+				logger.Int("version", record.Version),
+				logger.String("description", record.Description),
+				logger.Time("applied_at", record.AppliedAt),
+			)
+		}
 	}
 
-	// Here you would add additional migration steps:
-	// - Create collections with specific options
-	// - Add validation rules
-	// - Update existing documents
-	// - Add new fields with default values
-
-	log.Info("All migrations completed successfully")
 	return nil
 }
 
