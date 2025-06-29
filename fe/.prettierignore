@@ -1,0 +1,10 @@
+# Prettier ignore file
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.d.ts
+*.min.js
+*.min.css
+.env*
+!.env.example

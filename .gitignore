@@ -2,6 +2,11 @@
 node_modules/
 npm-debug.log*
 
+# Frontend build output
+fe/dist/
+fe/dist-ssr/
+fe/coverage/
+
 # Development tools
 .markdownlint.json
 
