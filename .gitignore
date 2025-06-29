@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Development tools
+.markdownlint.json
+
+# Temporary files
+*.tmp
+*.temp

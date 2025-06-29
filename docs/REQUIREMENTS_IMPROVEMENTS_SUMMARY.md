@@ -4,6 +4,20 @@
 
 The REQUIREMENTS.md document has been significantly enhanced with comprehensive improvements to both content and formatting. The document now serves as a complete, professional specification suitable for enterprise banking software development.
 
+---
+
+## 📚 Table of Contents
+
+1. [Key Improvements Made](#-key-improvements-made)
+2. [Content Statistics](#-content-statistics)
+3. [Formatting Improvements](#-formatting-improvements)
+4. [Banking Industry Alignment](#-banking-industry-alignment)
+5. [Next Steps and Recommendations](#-next-steps-and-recommendations)
+6. [Business Value](#-business-value)
+7. [Compliance Readiness Checklist](#-compliance-readiness-checklist)
+
+---
+
 ## 🎯 Key Improvements Made
 
 ### 1. **Enhanced Visual Structure**

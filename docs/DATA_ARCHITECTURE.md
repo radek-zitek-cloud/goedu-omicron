@@ -23,7 +23,7 @@
 1. [Architecture Overview](#architecture-overview)
 2. [Entity Relationship Design](#entity-relationship-design)
 3. [Core Entity Foundation](#core-entity-foundation)
-4. [Data Flow Architecture](#data-flow-architecture)
+4. [Data Flow Architecture](#-data-flow-architecture)
 5. [Performance and Scalability](#performance-and-scalability)
 6. [Security and Compliance](#security-and-compliance)
 7. [Data Lifecycle Management](#data-lifecycle-management)
