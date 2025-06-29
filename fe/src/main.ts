@@ -1,9 +1,9 @@
 /**
  * Main application entry point for GoEdu Omicron Banking Control Testing Platform
- * 
+ *
  * This file initializes the Vue.js application with all necessary plugins and configurations
  * for a production-ready banking compliance and control testing system.
- * 
+ *
  * Key Features:
  * - Vue 3 with Composition API
  * - Vuetify 3 Material Design components
@@ -11,38 +11,38 @@
  * - Vue Router for navigation
  * - Apollo GraphQL client
  * - VueUse utilities
- * 
+ *
  * @author GoEdu Development Team
  * @version 1.0.0
  * @since 2024
  */
 
-import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import { createPinia } from 'pinia'
-import { createVuetify } from 'vuetify'
-import { DefaultApolloClient } from '@vue/apollo-composable'
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core'
+import { createApp } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import { createPinia } from 'pinia';
+import { createVuetify } from 'vuetify';
+import { DefaultApolloClient } from '@vue/apollo-composable';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core';
 
 // Import Vuetify styles and icons
-import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css'
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import 'vuetify/styles';
+import '@mdi/font/css/materialdesignicons.css';
+import 'material-design-icons-iconfont/dist/material-design-icons.css';
 
 // Import main components and styles
-import App from './App.vue'
-import './assets/main.css'
-import router from './router/index'
+import App from './App.vue';
+import './assets/main.css';
+import router from './router/index';
 
 // Import Vuetify theme configuration
 // import { themeConfig } from './plugins/vuetify' // Temporarily disabled for initial setup
 
 /**
  * Apollo GraphQL Client Configuration
- * 
+ *
  * Configures the GraphQL client for API communication with the backend.
  * Includes authentication headers and caching strategies.
- * 
+ *
  * Environment Variables Required:
  * - VITE_GRAPHQL_URI: Backend GraphQL endpoint URL
  * - VITE_API_BASE_URL: Base API URL for REST endpoints
@@ -52,9 +52,9 @@ const httpLink = createHttpLink({
   credentials: 'include', // Include cookies for authentication
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
-})
+    Accept: 'application/json',
+  },
+});
 
 const apolloClient = new ApolloClient({
   link: httpLink,
@@ -65,35 +65,35 @@ const apolloClient = new ApolloClient({
         fields: {
           controls: {
             merge(existing = [], incoming) {
-              return incoming
-            }
-          }
-        }
+              return incoming;
+            },
+          },
+        },
       },
       Control: {
         fields: {
           testResults: {
             merge(existing = [], incoming) {
-              return incoming
-            }
-          }
-        }
-      }
-    }
+              return incoming;
+            },
+          },
+        },
+      },
+    },
   }),
   defaultOptions: {
     watchQuery: {
-      errorPolicy: 'all'
+      errorPolicy: 'all',
     },
     query: {
-      errorPolicy: 'all'
-    }
-  }
-})
+      errorPolicy: 'all',
+    },
+  },
+});
 
 /**
  * Vuetify Material Design Configuration
- * 
+ *
  * Creates Vuetify instance with custom theme optimized for banking applications.
  * Includes accessibility features and professional color schemes.
  */
@@ -110,84 +110,84 @@ const vuetify = createVuetify({
           error: '#ff5252',
           info: '#2196f3',
           success: '#4caf50',
-          warning: '#ffc107'
-        }
-      }
-    }
+          warning: '#ffc107',
+        },
+      },
+    },
   },
   defaults: {
     // Default component props for consistency
     VBtn: {
       variant: 'elevated',
-      color: 'primary'
+      color: 'primary',
     },
     VCard: {
       variant: 'elevated',
-      elevation: 2
+      elevation: 2,
     },
     VTextField: {
       variant: 'outlined',
-      density: 'comfortable'
+      density: 'comfortable',
     },
     VSelect: {
       variant: 'outlined',
-      density: 'comfortable'
-    }
-  }
-})
+      density: 'comfortable',
+    },
+  },
+});
 
 /**
  * Pinia State Management Store
- * 
+ *
  * Global state management for user authentication, organization data,
  * and application-wide settings.
  */
-const pinia = createPinia()
+const pinia = createPinia();
 
 /**
  * Application Initialization
- * 
+ *
  * Creates and configures the Vue application instance with all plugins
  * and global configurations required for the banking control platform.
- * 
+ *
  * Order of plugin registration is important for proper dependency injection.
  */
 async function initializeApp() {
   try {
-    const app = createApp(App)
+    const app = createApp(App);
 
     // Register plugins in order of dependency
-    app.use(pinia)           // State management first
-    app.use(router)          // Router second
-    app.use(vuetify)         // UI framework third
+    app.use(pinia); // State management first
+    app.use(router); // Router second
+    app.use(vuetify); // UI framework third
 
     // Provide Apollo client globally
-    app.provide(DefaultApolloClient, apolloClient)
+    app.provide(DefaultApolloClient, apolloClient);
 
     // Global error handler for production monitoring
     app.config.errorHandler = (error, instance, info) => {
-      console.error('Global error caught:', error, info)
-      
+      console.error('Global error caught:', error, info);
+
       // In production, send to monitoring service
       if (import.meta.env.PROD) {
         // TODO: Integrate with error monitoring service (Sentry, etc.)
-        console.error('Production error:', { error, info })
+        console.error('Production error:', { error, info });
       }
-    }
+    };
 
     // Global properties for debugging (development only)
     if (import.meta.env.DEV) {
-      app.config.globalProperties.$log = console.log
-      app.config.globalProperties.$apolloClient = apolloClient
+      app.config.globalProperties.$log = console.log;
+      app.config.globalProperties.$apolloClient = apolloClient;
     }
 
     // Mount application to DOM
-    app.mount('#app')
+    app.mount('#app');
 
-    console.log('✅ GoEdu Omicron Banking Platform initialized successfully')
+    console.log('✅ GoEdu Omicron Banking Platform initialized successfully');
   } catch (error) {
-    console.error('❌ Failed to initialize application:', error)
-    
+    console.error('❌ Failed to initialize application:', error);
+
     // Show user-friendly error message
     document.getElementById('app')!.innerHTML = `
       <div style="padding: 2rem; text-align: center; font-family: Arial, sans-serif;">
@@ -197,9 +197,9 @@ async function initializeApp() {
           ${error}
         </pre>
       </div>
-    `
+    `;
   }
 }
 
 // Initialize the application
-initializeApp()
+initializeApp();

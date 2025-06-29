@@ -27,20 +27,15 @@ function addUser(name: string, email: string): void {
     id: Date.now(),
     name,
     email,
-    active: true
+    active: true,
   };
-  
+
   users.push(newUser);
   userCount.value++;
 }
 
 // Export for use in components
-export {
-  userCount,
-  users,
-  activeUsers,
-  addUser
-};
+export { userCount, users, activeUsers, addUser };
 
 // This validates:
 // ✅ Vue 3 Composition API (ref, computed, reactive)
