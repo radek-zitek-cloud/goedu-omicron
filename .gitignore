@@ -8,3 +8,45 @@ npm-debug.log*
 # Temporary files
 *.tmp
 *.temp
+
+# Go build artifacts
+/be/bin/
+/be/tmp/
+/be/vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go test files
+*.test
+*.out
+/be/coverage.html
+/be/coverage.out
+
+# Environment files
+/be/.env
+/be/.env.local
+/be/.env.production
+
+# Log files
+*.log
+/be/logs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+Thumbs.db
