@@ -18,11 +18,11 @@
  */
 
 import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 import { createVuetify } from 'vuetify';
 import { DefaultApolloClient } from '@vue/apollo-composable';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core';
+import { createPersistedState } from 'pinia-plugin-persistedstate';
 
 // Import Vuetify styles and icons
 import 'vuetify/styles';
@@ -33,6 +33,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import App from './App.vue';
 import './assets/main.css';
 import router from './router/index';
+import { initializeStores } from './stores/index';
 
 // Import Vuetify theme configuration
 // import { themeConfig } from './plugins/vuetify' // Temporarily disabled for initial setup
@@ -64,7 +65,7 @@ const apolloClient = new ApolloClient({
       Organization: {
         fields: {
           controls: {
-            merge(existing = [], incoming) {
+            merge(_existing = [], incoming) {
               return incoming;
             },
           },
@@ -73,7 +74,7 @@ const apolloClient = new ApolloClient({
       Control: {
         fields: {
           testResults: {
-            merge(existing = [], incoming) {
+            merge(_existing = [], incoming) {
               return incoming;
             },
           },
@@ -140,9 +141,31 @@ const vuetify = createVuetify({
  * Pinia State Management Store
  *
  * Global state management for user authentication, organization data,
- * and application-wide settings.
+ * and application-wide settings with persistence for offline capability.
+ *
+ * Features:
+ * - Centralized state management
+ * - TypeScript integration
+ * - Devtools support in development
+ * - Persistence layer for offline capability
+ * - Reactive state updates across components
  */
 const pinia = createPinia();
+
+// Add persistence plugin for offline capability
+pinia.use(
+  createPersistedState({
+    // Global persistence options
+    storage: localStorage,
+    debug: import.meta.env.DEV,
+  })
+);
+
+// Enable devtools integration in development
+if (import.meta.env.DEV) {
+  // Pinia devtools are automatically enabled in development
+  console.log('🛠️ Pinia devtools enabled for development');
+}
 
 /**
  * Application Initialization
@@ -163,6 +186,9 @@ async function initializeApp() {
 
     // Provide Apollo client globally
     app.provide(DefaultApolloClient, apolloClient);
+
+    // Initialize stores and HTTP interceptors
+    initializeStores();
 
     // Global error handler for production monitoring
     app.config.errorHandler = (error, instance, info) => {
