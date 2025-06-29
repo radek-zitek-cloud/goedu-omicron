@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/radek-zitek-cloud/goedu-omicron/be/internal/config"
@@ -159,40 +160,70 @@ func createSampleUsers(ctx context.Context, db *database.Client, log *logger.Log
 
 	users := []*models.User{
 		{
-			FirstName:      "John",
-			LastName:       "Admin",
-			Email:          "admin@samplefinance.com",
-			PasswordHash:   "$2a$12$placeholder", // In real implementation, hash properly
+			Email: "admin@samplefinance.com",
+			Profile: models.UserProfile{
+				FirstName:  "John",
+				LastName:   "Admin",
+				Title:      "System Administrator",
+				Department: "IT",
+			},
+			Authentication: models.AuthenticationDetails{
+				PasswordHash: "$2a$12$placeholder", // In real implementation, hash properly
+			},
 			OrganizationID: org.ID,
-			Role:           models.RoleAdmin,
-			Title:          "System Administrator",
-			Department:     "IT",
+			Roles:          []string{models.RoleAdmin},
+			IsActive:       true,
 			Status:         models.UserStatusActive,
-			Permissions:    []string{"manage_users", "manage_controls", "view_reports"},
+			Permissions: models.UserPermissions{
+				CanManageUsers:    true,
+				CanManageSettings: true,
+				CanViewReports:    true,
+				CanEditControls:   true,
+				CanViewControls:   true,
+			},
 		},
 		{
-			FirstName:      "Jane",
-			LastName:       "Auditor",
-			Email:          "auditor@samplefinance.com",
-			PasswordHash:   "$2a$12$placeholder",
+			Email: "auditor@samplefinance.com",
+			Profile: models.UserProfile{
+				FirstName:  "Jane",
+				LastName:   "Auditor",
+				Title:      "Senior Auditor",
+				Department: "Internal Audit",
+			},
+			Authentication: models.AuthenticationDetails{
+				PasswordHash: "$2a$12$placeholder",
+			},
 			OrganizationID: org.ID,
-			Role:           models.RoleAuditor,
-			Title:          "Senior Auditor",
-			Department:     "Internal Audit",
+			Roles:          []string{models.RoleAuditor},
+			IsActive:       true,
 			Status:         models.UserStatusActive,
-			Permissions:    []string{"test_controls", "request_evidence", "view_reports"},
+			Permissions: models.UserPermissions{
+				CanViewControls:   true,
+				CanExecuteTests:   true,
+				CanUploadEvidence: true,
+				CanViewReports:    true,
+			},
 		},
 		{
-			FirstName:      "Mike",
-			LastName:       "Owner",
-			Email:          "owner@samplefinance.com",
-			PasswordHash:   "$2a$12$placeholder",
+			Email: "owner@samplefinance.com",
+			Profile: models.UserProfile{
+				FirstName:  "Mike",
+				LastName:   "Owner",
+				Title:      "Control Owner",
+				Department: "Operations",
+			},
+			Authentication: models.AuthenticationDetails{
+				PasswordHash: "$2a$12$placeholder",
+			},
 			OrganizationID: org.ID,
-			Role:           models.RoleOwner,
-			Title:          "Control Owner",
-			Department:     "Operations",
+			Roles:          []string{models.RoleOwner},
+			IsActive:       true,
 			Status:         models.UserStatusActive,
-			Permissions:    []string{"manage_controls", "upload_evidence"},
+			Permissions: models.UserPermissions{
+				CanViewControls:   true,
+				CanUploadEvidence: true,
+				CanViewReports:    true,
+			},
 		},
 	}
 
@@ -206,7 +237,7 @@ func createSampleUsers(ctx context.Context, db *database.Client, log *logger.Log
 
 		log.Info("Sample user created",
 			logger.String("email", user.Email),
-			logger.String("role", user.Role),
+			logger.String("role", strings.Join(user.Roles, ",")),
 		)
 	}
 
