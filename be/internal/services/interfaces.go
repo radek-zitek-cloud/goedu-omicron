@@ -175,6 +175,61 @@ type PermissionService interface {
 	SyncUserPermissions(ctx context.Context, userID string) error
 }
 
+// OrganizationService handles organization management and multi-tenancy operations.
+// It provides comprehensive organization lifecycle management, subscription handling,
+// and feature flag management for the multi-tenant platform.
+type OrganizationService interface {
+	// Organization CRUD operations
+	CreateOrganization(ctx context.Context, input *CreateOrganizationInput) (*models.Organization, error)
+	GetOrganization(ctx context.Context, id string) (*models.Organization, error)
+	GetOrganizationBySlug(ctx context.Context, slug string) (*models.Organization, error)
+	UpdateOrganization(ctx context.Context, id string, input *UpdateOrganizationInput) (*models.Organization, error)
+	DeleteOrganization(ctx context.Context, id string) error
+	
+	// Organization listing and filtering
+	ListOrganizations(ctx context.Context, filter *OrganizationFilter) (*OrganizationConnection, error)
+	GetActiveOrganizations(ctx context.Context, limit, offset int) ([]*models.Organization, error)
+	
+	// Subscription management
+	UpdateSubscription(ctx context.Context, orgID string, subscription *models.OrganizationSubscription) error
+	GetSubscriptionStatus(ctx context.Context, orgID string) (*models.OrganizationSubscription, error)
+	UpgradeSubscription(ctx context.Context, orgID, newPlan string) error
+	DowngradeSubscription(ctx context.Context, orgID, newPlan string) error
+	CancelSubscription(ctx context.Context, orgID string) error
+	RenewSubscription(ctx context.Context, orgID string) error
+	
+	// Feature flag management
+	GetFeatureFlags(ctx context.Context, orgID string) (map[string]bool, error)
+	UpdateFeatureFlag(ctx context.Context, orgID, flag string, enabled bool) error
+	BulkUpdateFeatureFlags(ctx context.Context, orgID string, flags map[string]bool) error
+	IsFeatureEnabled(ctx context.Context, orgID, feature string) (bool, error)
+	
+	// Organization settings management
+	GetSettings(ctx context.Context, orgID string) (*models.OrganizationSettings, error)
+	UpdateSettings(ctx context.Context, orgID string, settings *models.OrganizationSettings) error
+	UpdatePartialSettings(ctx context.Context, orgID string, updates map[string]interface{}) error
+	
+	// Member management
+	GetMemberCount(ctx context.Context, orgID string) (int, error)
+	UpdateMemberCount(ctx context.Context, orgID string, count int) error
+	GetMemberLimits(ctx context.Context, orgID string) (current, max int, error)
+	CanAddMember(ctx context.Context, orgID string) (bool, error)
+	
+	// Organization validation and compliance
+	ValidateOrganization(ctx context.Context, org *models.Organization) error
+	CheckComplianceRequirements(ctx context.Context, orgID string) (*ComplianceStatus, error)
+	UpdateRegulatoryProfile(ctx context.Context, orgID string, profile *models.RegulatoryProfile) error
+	
+	// Organization statistics and analytics
+	GetOrganizationStats(ctx context.Context, orgID string) (*OrganizationStats, error)
+	GetUsageMetrics(ctx context.Context, orgID string, timeRange *TimeRange) (*UsageMetrics, error)
+	
+	// Multi-tenancy support methods
+	GetOrganizationContext(ctx context.Context, userID string) (*OrganizationContext, error)
+	ValidateOrganizationAccess(ctx context.Context, userID, orgID string) error
+	GetUserOrganizations(ctx context.Context, userID string) ([]*models.Organization, error)
+}
+
 // UserService manages user accounts, authentication, and authorization.
 // It handles user lifecycle and security operations.
 type UserService interface {
@@ -542,4 +597,205 @@ type PermissionFilter struct {
 	// Pagination
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
+}
+
+// Organization service input/output structures
+
+// CreateOrganizationInput contains data for creating a new organization
+type CreateOrganizationInput struct {
+	// Basic information
+	Name        string `json:"name" validate:"required,min=1,max=255"`
+	DisplayName string `json:"display_name,omitempty"`
+	Description string `json:"description,omitempty"`
+	
+	// Organization classification
+	Type     string `json:"type" validate:"required"` // commercial_bank, credit_union, etc.
+	Industry string `json:"industry" validate:"required"`
+	Size     string `json:"size,omitempty"`
+	Region   string `json:"region,omitempty"`
+	Country  string `json:"country,omitempty"`
+	Timezone string `json:"timezone,omitempty"`
+	Currency string `json:"currency,omitempty"`
+	
+	// Contact information
+	ContactEmail string  `json:"contact_email" validate:"required,email"`
+	ContactPhone string  `json:"contact_phone,omitempty"`
+	Website      string  `json:"website,omitempty"`
+	LogoURL      string  `json:"logo_url,omitempty"`
+	Address      *CreateAddressInput `json:"address,omitempty"`
+	
+	// Regulatory profile
+	RegulatoryProfile *CreateRegulatoryProfileInput `json:"regulatory_profile,omitempty"`
+	
+	// Subscription plan
+	SubscriptionPlan string `json:"subscription_plan,omitempty"` // starter, professional, enterprise
+	
+	// Initial settings
+	Settings *CreateOrganizationSettingsInput `json:"settings,omitempty"`
+}
+
+// UpdateOrganizationInput contains data for updating an organization
+type UpdateOrganizationInput struct {
+	// Basic information
+	Name        *string `json:"name,omitempty"`
+	DisplayName *string `json:"display_name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	
+	// Organization classification
+	Type     *string `json:"type,omitempty"`
+	Industry *string `json:"industry,omitempty"`
+	Size     *string `json:"size,omitempty"`
+	Region   *string `json:"region,omitempty"`
+	Country  *string `json:"country,omitempty"`
+	Timezone *string `json:"timezone,omitempty"`
+	Currency *string `json:"currency,omitempty"`
+	
+	// Contact information
+	ContactEmail *string `json:"contact_email,omitempty"`
+	ContactPhone *string `json:"contact_phone,omitempty"`
+	Website      *string `json:"website,omitempty"`
+	LogoURL      *string `json:"logo_url,omitempty"`
+	
+	// Status and limits
+	Status     *string `json:"status,omitempty"`
+	MaxMembers *int    `json:"max_members,omitempty"`
+}
+
+// CreateAddressInput contains address information for organization creation
+type CreateAddressInput struct {
+	Street1    string `json:"street1,omitempty"`
+	Street2    string `json:"street2,omitempty"`
+	City       string `json:"city,omitempty"`
+	State      string `json:"state,omitempty"`
+	PostalCode string `json:"postal_code,omitempty"`
+	Country    string `json:"country,omitempty"`
+}
+
+// CreateRegulatoryProfileInput contains regulatory profile information
+type CreateRegulatoryProfileInput struct {
+	Industry             string   `json:"industry"`
+	PrimaryRegulator     string   `json:"primary_regulator"`
+	ApplicableFrameworks []string `json:"applicable_frameworks"`
+	ExamCycle            string   `json:"exam_cycle"`
+	RetentionPeriod      int      `json:"retention_period"`
+	RiskTolerance        string   `json:"risk_tolerance"`
+	RequiresSOX          bool     `json:"requires_sox"`
+	RequiresPCIDSS       bool     `json:"requires_pci_dss"`
+	RequiresFFIEC        bool     `json:"requires_ffiec"`
+	RequiresBaselIII     bool     `json:"requires_basel_iii"`
+}
+
+// CreateOrganizationSettingsInput contains initial organization settings
+type CreateOrganizationSettingsInput struct {
+	RequireMFA            bool `json:"require_mfa"`
+	AllowInvitations      bool `json:"allow_invitations"`
+	SessionTimeoutMinutes int  `json:"session_timeout_minutes"`
+	EnableAuditLog        bool `json:"enable_audit_log"`
+	DataRetentionDays     int  `json:"data_retention_days"`
+	AllowDataExport       bool `json:"allow_data_export"`
+}
+
+// OrganizationFilter defines filtering options for organization queries
+type OrganizationFilter struct {
+	Type     string `json:"type,omitempty"`
+	Industry string `json:"industry,omitempty"`
+	Status   string `json:"status,omitempty"`
+	Region   string `json:"region,omitempty"`
+	Country  string `json:"country,omitempty"`
+	Plan     string `json:"plan,omitempty"`
+	
+	// Search
+	Search string `json:"search,omitempty"`
+	
+	// Pagination
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+	
+	// Sorting
+	SortBy    string `json:"sort_by"`
+	SortOrder string `json:"sort_order"`
+}
+
+// OrganizationConnection represents a paginated list of organizations
+type OrganizationConnection struct {
+	Nodes      []*models.Organization `json:"nodes"`
+	TotalCount int                    `json:"total_count"`
+	HasMore    bool                   `json:"has_more"`
+}
+
+// ComplianceStatus represents organization compliance status
+type ComplianceStatus struct {
+	OverallStatus        string            `json:"overall_status"`
+	RequiredFrameworks   []string          `json:"required_frameworks"`
+	CompletedFrameworks  []string          `json:"completed_frameworks"`
+	PendingRequirements  []string          `json:"pending_requirements"`
+	ComplianceScore      float64           `json:"compliance_score"`
+	LastAssessmentDate   time.Time         `json:"last_assessment_date"`
+	NextAssessmentDate   time.Time         `json:"next_assessment_date"`
+	FrameworkStatus      map[string]string `json:"framework_status"`
+}
+
+// OrganizationStats represents organization statistics and metrics
+type OrganizationStats struct {
+	TotalUsers        int                `json:"total_users"`
+	ActiveUsers       int                `json:"active_users"`
+	TotalControls     int                `json:"total_controls"`
+	ActiveCycles      int                `json:"active_cycles"`
+	PendingEvidence   int                `json:"pending_evidence"`
+	StorageUsed       int64              `json:"storage_used"`
+	LastActivity      time.Time          `json:"last_activity"`
+	UsersByRole       map[string]int     `json:"users_by_role"`
+	ControlsByFramework map[string]int   `json:"controls_by_framework"`
+}
+
+// UsageMetrics represents organization usage metrics over time
+type UsageMetrics struct {
+	Period           string                   `json:"period"`
+	UserActivity     []UserActivityMetric     `json:"user_activity"`
+	SystemUsage      []SystemUsageMetric      `json:"system_usage"`
+	FeatureUsage     map[string]int           `json:"feature_usage"`
+	StorageGrowth    []StorageMetric          `json:"storage_growth"`
+	ComplianceMetrics []ComplianceMetric      `json:"compliance_metrics"`
+}
+
+// UserActivityMetric represents user activity over time
+type UserActivityMetric struct {
+	Date       time.Time `json:"date"`
+	ActiveUsers int      `json:"active_users"`
+	Logins     int      `json:"logins"`
+	Sessions   int      `json:"sessions"`
+}
+
+// SystemUsageMetric represents system usage metrics
+type SystemUsageMetric struct {
+	Date      time.Time `json:"date"`
+	Requests  int       `json:"requests"`
+	Errors    int       `json:"errors"`
+	AvgResponseTime float64 `json:"avg_response_time"`
+}
+
+// StorageMetric represents storage usage over time
+type StorageMetric struct {
+	Date        time.Time `json:"date"`
+	TotalBytes  int64     `json:"total_bytes"`
+	FileCount   int       `json:"file_count"`
+	GrowthRate  float64   `json:"growth_rate"`
+}
+
+// ComplianceMetric represents compliance metrics over time
+type ComplianceMetric struct {
+	Date            time.Time `json:"date"`
+	ComplianceScore float64   `json:"compliance_score"`
+	OpenFindings    int       `json:"open_findings"`
+	ClosedFindings  int       `json:"closed_findings"`
+}
+
+// OrganizationContext represents the organization context for a user
+type OrganizationContext struct {
+	OrganizationID   string                     `json:"organization_id"`
+	Organization     *models.Organization       `json:"organization"`
+	UserRole         string                     `json:"user_role"`
+	UserPermissions  []string                   `json:"user_permissions"`
+	FeatureFlags     map[string]bool            `json:"feature_flags"`
+	Settings         *models.OrganizationSettings `json:"settings"`
 }
